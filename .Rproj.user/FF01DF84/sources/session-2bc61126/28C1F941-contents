@@ -1,0 +1,65 @@
+import os
+import json
+import pandas as pd
+
+# Load data
+print("Loading data...")
+expression_data = pd.read_csv("normalized_expression_sparse.csv")
+meta_data = pd.read_csv("metadata.csv", index_col=0)  # Ensure index is Cell ID
+
+# Create directory for samples
+os.makedirs("sc_sample_jsons", exist_ok=True)
+
+# Convert metadata into a dictionary for fast lookup
+cell_to_sample = meta_data["sample_id"].to_dict()
+# Save cell_to_sample mapping
+with open("cell_to_sample.json", "w") as f:
+    json.dump(cell_to_sample, f, indent=4)
+    
+# Create a reverse mapping: sample → list of cells
+sample_to_cell = defaultdict(list)
+for cell, sample in cell_to_sample.items():
+    sample_to_cell[sample].append(cell)
+# Save sample_to_cell mapping
+with open("sample_to_cell.json", "w") as f:
+    json.dump(sample_to_cell, f, indent=4)
+
+print("Saving samples...")
+i = 0
+
+# Dictionary to store sample-wise data
+sample_data = {}
+
+for _, row in expression_data.iterrows():
+    gene = row["Gene"]
+    cell = row["Cell"]
+    expression = row["Expression"]
+
+    # Lookup sample ID using cell_to_sample dictionary
+    sample = cell_to_sample.get(cell)
+    if sample is None:
+        continue  # Skip if cell is not found in metadata
+
+    # Initialize sample dictionary if not exists
+    if sample not in sample_data:
+        sample_data[sample] = {}
+
+    # Add gene expression per cell
+    if gene not in sample_data[sample]:
+        sample_data[sample][gene] = {}
+
+    ## which of the following is better???
+    # sample_data[sample][gene][cell] = expression
+    sample_data[sample][cell][gene] = expression
+
+    # Progress tracking
+    i += 1
+    if i % 10000 == 0:
+        print(f"Processed {i} rows...")
+
+# Save each sample as a JSON file
+for sample, data in sample_data.items():
+    with open(f"sc_sample_jsons/{sample}.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+print("Sample JSON files saved successfully!")

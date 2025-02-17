@@ -1,0 +1,26 @@
+{
+    "id": "28C1F941",
+    "path": "/mnt/data/projects/donglab/ruifeng_2025/SCST_Data/generate_json_sample.py",
+    "project_path": "generate_json_sample.py",
+    "type": "python",
+    "hash": "3234821702",
+    "contents": "",
+    "dirty": true,
+    "created": 1738768871112.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "24,42",
+        "scrollLine": "1"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1738770905,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1738770905501,
+    "read_only": false,
+    "read_only_alternatives": []
+}

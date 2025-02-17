@@ -1,0 +1,39 @@
+import pandas as pd
+import json
+import os
+
+# Load normalized expression data (sparse format)
+print("Reading data...")
+expression_data = pd.read_csv("normalized_expression_sparse.csv",index_col=None, header=0)
+
+# Load metadata table
+meta_data = pd.read_csv("sc_metadata.csv", index_col=0)  # Assuming index is cell ID
+
+# Create directory for genes
+os.makedirs("sc_gene_jsons", exist_ok=True)
+
+# Group data by gene
+grouped_by_gene = expression_data.groupby("Gene")
+
+# Save each gene as a separate JSON file
+print("Saving gene...")
+i=0
+for gene, df in grouped_by_gene:
+    try:
+        i += 1
+        print(i,gene)
+        
+        safe_gene_name = gene.replace("/", "_")
+        file_name = f"sc_gene_jsons/{safe_gene_name}.json"
+        if os.path.exists(file_name):
+          print(f"File {file_name} already exists, skipping...")
+          continue  # Skip if the file already exists
+        
+        gene_dict = dict(zip(df["Cell"], df["Expression"]))
+        with open(file_name, "w") as f:
+            json.dump(gene_dict, f, indent=4)
+    except Exception as e:
+        print(f"Error in pricessing {gene} !!! Check the error_gene.txt")
+        with open("error_gene.txt","a") as f_err:
+          f_err.write(gene+"\n")
+        
