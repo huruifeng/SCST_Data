@@ -1,3 +1,6 @@
+library(reticulate)
+use_condaenv("r4_env")  
+
 library(jsonlite)
 library(Matrix)
 library(data.table)
@@ -10,20 +13,22 @@ seurat_obj <- readRDS("data_Jie.rds")
 print("Save metadata...")
 # Save to CSV with index as the first column
 metadata = seurat_obj@meta.data
-write.csv(metadata, "SC/raw_metadata.csv", row.names = TRUE)
+write.csv(metadata, "ST/raw_metadata.csv", row.names = TRUE)
 
 # save the umap embedding
+x = seurat_obj@reductions
 print("Save umap embedding...")
 umap_embeddings <- seurat_obj@reductions$umap@cell.embeddings
-write.csv(umap_embeddings, "SC/raw_umap_embeddings.csv", row.names = TRUE)
+write.csv(umap_embeddings, "ST/raw_umap_embeddings.csv", row.names = TRUE)
 
 
 # Extract normalized counts (log-normalized values)
 print("Saving normalized data...")
-# raw_counts <- seurat_obj@assays$RNA@counts
+# raw_counts <- seurat_obj@assays$Spatial@counts
 
 # Extract normalized expression data
-normalized_counts <- seurat_obj@assays$RNA@data  # This is a sparse matrix
+normalized_counts <- seurat_obj@assays$Spatial@data  # This is a sparse matrix
+
 
 # Convert sparse matrix to triplet format (long format)
 long_data <- summary(normalized_counts)
@@ -43,5 +48,10 @@ nonzero_data <- long_data[long_data$Expression != 0, ]
 nonzero_data <- as.data.table(nonzero_data)
 
 # Save to CSV
-fwrite(nonzero_data, "SC/raw_normalized_expression_sparse.csv", row.names = FALSE)
+fwrite(nonzero_data, "ST/raw_normalized_expression_sparse.csv", row.names = FALSE)
+
+
+library(Seurat)
+images = seurat_obj@images
+
 
