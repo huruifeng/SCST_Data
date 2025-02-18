@@ -13,7 +13,7 @@ seurat_obj <- readRDS("data_Jie.rds")
 print("Save metadata...")
 # Save to CSV with index as the first column
 metadata = seurat_obj@meta.data
-write.csv(metadata, "ST/raw_metadata.csv", row.names = TRUE)
+write.csv(metadata, "ST/raw_metadata.csv", row.names = F)
 
 # save the umap embedding
 x = seurat_obj@reductions
@@ -33,13 +33,13 @@ normalized_counts <- seurat_obj@assays$Spatial@data  # This is a sparse matrix
 # Convert sparse matrix to triplet format (long format)
 long_data <- summary(normalized_counts)
 
-# Get row (gene) and column (cell) names
+# Get row (gene) and column (spot) names
 long_data$Gene <- rownames(normalized_counts)[long_data$i]
-long_data$Cell <- colnames(normalized_counts)[long_data$j]
+long_data$Spot <- colnames(normalized_counts)[long_data$j]
 long_data$Expression <- long_data$x
 
 # Keep only necessary columns
-long_data <- long_data[, c("Gene", "Cell", "Expression")]
+long_data <- long_data[, c("Gene", "Spot", "Expression")]
 
 # Filter out zero values
 nonzero_data <- long_data[long_data$Expression != 0, ]
@@ -52,6 +52,32 @@ fwrite(nonzero_data, "ST/raw_normalized_expression_sparse.csv", row.names = FALS
 
 
 library(Seurat)
+library(EBImage)
 images = seurat_obj@images
+all_names = names(images)
+
+## Create the directory
+dir.create("ST/images", showWarnings = FALSE)
+dir.create("ST/coordinates", showWarnings = FALSE)
+
+#Loop and extract the image data
+for (i in 1:length(all_names)) {
+    print(all_names[i])
+
+    image_name = all_names[i]
+    spatial_data = images[[image_name]]
+    image_array = spatial_data@image
+    coordinates = spatial_data@coordinates
+
+    # Convert to EBImage format
+    image_eb <- Image(image_array, colormode = "Color")
+
+    # Save as PNG (best for analysis)
+    writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".png"), type = "png")
+    writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".tiff"), type = "tiff")
+
+    write.csv(coordinates, paste0("ST/coordinates/raw_coordinates_", image_name, ".csv"), row.names = FALSE)
+}
+
 
 
