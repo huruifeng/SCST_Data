@@ -3,7 +3,7 @@ import json
 import os
 
 # %% =============================================
-project = "SC"
+project = "ST"
 # Load normalized expression data (sparse format)
 print("Reading data...")
 expression_data = pd.read_csv(project + "/normalized_expression_sparse.csv",index_col=None, header=0)
@@ -15,8 +15,9 @@ grouped_by_gene = expression_data.groupby("Gene")
 all_genes = grouped_by_gene.groups.keys()
 all_genes = [gene_i.replace("/", "_") for gene_i in list(set(all_genes))]
 with open(project + "/gene_list.json", "w") as f:
-    json.dump(all_genes, f)
+    json.dump(sorted(all_genes), f)
 
+stop
 # %% =============================================
 # Create directory for genes
 os.makedirs(project+ "/gene_jsons", exist_ok=True)
@@ -28,7 +29,7 @@ for gene, df in grouped_by_gene:
     try:
         i += 1
         print(i,gene)
-        gene_dict = dict(zip(df["Cell"], df["Expression"]))
+        gene_dict = dict(zip(df["Spot"], df["Expression"]))
         
         safe_gene_name = gene.replace("/", "_")
 
