@@ -2,6 +2,7 @@
 import pandas as pd
 import json
 from collections import defaultdict
+import os
 
 # %%
 ##===============================
@@ -62,7 +63,6 @@ metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dt
 metadata_lite = metadata.loc[:,c_ls]
 metadata_lite.to_csv(project + "/metadata_lite.csv",index_label="spot_id")
 
-stop
 # %% ============================================================================
 print("Converting data...")
 # Convert metadata into a dictionary for fast lookup
@@ -111,6 +111,37 @@ data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label
 embeddings_data["sample_id"] = embeddings_data.index.map(spot_to_sample)
 embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_label="Cell")
 
+## rename imgage file name
+subject_to_sample = dict(zip(metadata["subject_id"].tolist(),metadata["sample_id"].tolist()))
+files = os.listdir(project + "/images")
+for file in files:
+    if file.endswith(".png"):
+        subject_id = file[:-4].split("_")[-1]
+        if subject_id not in subject_to_sample:
+            print(subject_id)
+            continue
+        new_name = subject_to_sample[subject_id] + ".png"
+        os.rename(project + "/images/" + file, project + "/images/" + new_name)
+    if file.endswith(".tiff"):
+        subject_id = file[:-5].split("_")[-1]
+        if subject_id not in subject_to_sample:
+            print(subject_id)
+            continue
+        new_name = subject_to_sample[subject_id] + ".tiff"
+        os.rename(project + "/images/" + file, project + "/images/" + new_name)
+
+files = os.listdir(project + "/coordinates")
+for file in files:
+    if file.endswith(".csv"):
+        subject_id = file[:-4].split("_")[-1]
+        if subject_id not in subject_to_sample:
+            print(subject_id)
+            continue
+        new_name = subject_to_sample[subject_id] + ".csv"
+        os.rename(project + "/coordinates/" + file, project + "/coordinates/" + new_name)
+  
+
+stop
 
 # %% ============================================================================
 # %%
