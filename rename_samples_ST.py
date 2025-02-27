@@ -49,8 +49,6 @@ metadata.info()
 # %% ==============================================
 # "spot_id","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5",
 # "Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs"Pericytes.1","Pericytes.2","T.Cells","cell2loc_sum"
-c_ls = ["sample_id","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5",
-        "Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs","Pericytes.1","Pericytes.2","T.Cells","cell2loc_sum"]
 
 metadata["MajorCellTypes"] = metadata[["Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs","Pericytes.1","Pericytes.2","T.Cells"]].idxmax(axis=1)
 # metadata["MajorType"] = metadata["MajorType"].apply(lambda x: x.replace(".",""))
@@ -60,8 +58,11 @@ metadata["MajorCellTypes"] = metadata[["Astrocytes","Endothelial.Cells", "Fibrob
 metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(4)
 
 
+c_ls = ["sample_id","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
+        "Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs","Pericytes.1","Pericytes.2","T.Cells","cell2loc_sum"]
+
 metadata_lite = metadata.loc[:,c_ls]
-metadata_lite.to_csv(project + "/metadata_lite.csv",index_label="spot_id")
+metadata_lite.to_csv(project + "/metadata_lite.csv",index_label="cs_id")
 
 # %% ============================================================================
 print("Converting data...")
@@ -93,23 +94,23 @@ print("Renaming....")
 embeddings_data = embeddings_data.reset_index()  # Move index to a column
 embeddings_data["index"] = embeddings_data["index"].map(barcode_to_sid) # Rename using mapping
 embeddings_data = embeddings_data.set_index("index")  # Set the renamed column as index
-embeddings_data.to_csv(project + "/umap_embeddings.csv",index_label="Spot")
+embeddings_data.to_csv(project + "/umap_embeddings.csv",index_label="cs_id")
 
 # sampling data
 data_df = pd.merge(embeddings_data, metadata_lite, left_index=True, right_index=True)
-data_df.to_csv(f'{project}umap_embeddings_with_meta.csv', index_label="Spot")
+data_df.to_csv(f'{project}umap_embeddings_with_meta.csv', index_label="cs_id")
 
 # sampling data
 data_df_20 = data_df.sample(frac=0.2, random_state=1)
-data_df_20.to_csv(f'{project}/umap_embeddings_with_meta_20.csv', index_label="Spot")
+data_df_20.to_csv(f'{project}/umap_embeddings_with_meta_20.csv', index_label="cs_id")
 data_df_50 = data_df.sample(frac=0.5, random_state=1)
-data_df_50.to_csv(f'{project}/umap_embeddings_with_meta_50.csv', index_label="Spot")
+data_df_50.to_csv(f'{project}/umap_embeddings_with_meta_50.csv', index_label="cs_id")
 data_df_100k = data_df.sample(n=100000, random_state=1)
-data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="Spot")
+data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
 
 ## add sample_id to umap_embedding data
 embeddings_data["sample_id"] = embeddings_data.index.map(spot_to_sample)
-embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_label="Cell")
+embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_label="cs_id")
 
 ## rename imgage file name
 subject_to_sample = dict(zip(metadata["subject_id"].tolist(),metadata["sample_id"].tolist()))
@@ -150,7 +151,7 @@ print("Loading expression data...")
 expression_data = pd.read_csv(project + "/raw_normalized_expression_sparse.csv",index_col=None, header=0)
 ## rename "Cell" column use barcode_cid map
 print("Renaming....")
-expression_data["Spot"] = expression_data["Spot"].map(barcode_to_sid)
+expression_data["cs_id"] = expression_data["cs_id"].map(barcode_to_sid)
 
 ## "Expression" column keep 4 digits after the decimal point
 expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 4))
@@ -160,7 +161,7 @@ expression_data.to_csv(project + "/normalized_expression_sparse.csv", index=Fals
 
 
 ## add sample_id to expression data
-expression_data["sample_id"] = expression_data["Spot"].map(spot_to_sample)
+expression_data["sample_id"] = expression_data["cs_id"].map(spot_to_sample)
 
 ## save expression data
 expression_data.to_csv(f"{project}/normalized_expression_sparse_with_sample.csv", index=False)

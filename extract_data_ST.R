@@ -13,7 +13,7 @@ seurat_obj <- readRDS("data_Jie.rds")
 print("Save metadata...")
 # Save to CSV with index as the first column
 metadata = seurat_obj@meta.data
-write.csv(metadata, "ST/raw_metadata.csv", row.names = F)
+write.csv(metadata, "ST/raw_metadata.csv", row.names = FALSE)
 
 # save the umap embedding
 x = seurat_obj@reductions
@@ -76,7 +76,7 @@ for (i in 1:length(all_names)) {
     writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".png"), type = "png")
     writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".tiff"), type = "tiff")
 
-    write.csv(coordinates, paste0("ST/coordinates/raw_coordinates_", image_name, ".csv"), row.names = FALSE)
+    write.csv(coordinates, paste0("ST/coordinates/raw_coordinates_", image_name, ".csv"), row.names = TRUE)
 }
 
 
