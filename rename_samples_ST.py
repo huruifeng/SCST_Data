@@ -1,5 +1,6 @@
 # %% ==============================
 import pandas as pd
+import numpy as np
 import json
 from collections import defaultdict
 import os
@@ -11,7 +12,15 @@ project = "ST"
 metadata = pd.read_csv( project + "/raw_metadata.csv", index_col=0, header=0)
 metadata["barcode"] = metadata.index.tolist()
 
-spot_ids = ["s_"+str(i) for i in range(1,metadata.shape[0]+1)]
+spot_ids = []
+subject_spot_n = {}
+for index, row in metadata.iterrows():
+    subject_id = row["sample_name"]
+    if subject_id not in subject_spot_n:
+        subject_spot_n[subject_id] = 0
+    subject_spot_n[subject_id] += 1
+    spot_id = subject_id + "_s" + str(subject_spot_n[subject_id])
+    spot_ids.append(spot_id)
 metadata.index = spot_ids
 
 barcode_to_sid =  dict(zip(metadata["barcode"].tolist(), metadata.index.tolist()))
@@ -32,7 +41,7 @@ metadata.loc[metadata["diagnosis"] == "ILBD", "diagnosis"] = "ILB"
 metadata.loc[metadata["sex"] == 1, "sex"] = "M"
 metadata.loc[metadata["sex"] == 2, "sex"] = "F"
 
-
+metadata["selected_spot"].fillna(True, inplace=True)
 
 ## construct new sample_id
 metadata["replicate"] = "rep1"
@@ -55,7 +64,7 @@ metadata["MajorCellTypes"] = metadata[["Astrocytes","Endothelial.Cells", "Fibrob
 
 ## if the column data is float, keep 4 digits after the decimal point
 # Round only float columns to 4 decimal places
-metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(4)
+metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(2)
 
 
 c_ls = ["sample_id","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
@@ -100,12 +109,27 @@ embeddings_data.to_csv(project + "/umap_embeddings.csv",index_label="cs_id")
 data_df = pd.merge(embeddings_data, metadata_lite, left_index=True, right_index=True)
 data_df.to_csv(f'{project}umap_embeddings_with_meta.csv', index_label="cs_id")
 
-# sampling data
-data_df_20 = data_df.sample(frac=0.2, random_state=1)
-data_df_20.to_csv(f'{project}/umap_embeddings_with_meta_20.csv', index_label="cs_id")
-data_df_50 = data_df.sample(frac=0.5, random_state=1)
-data_df_50.to_csv(f'{project}/umap_embeddings_with_meta_50.csv', index_label="cs_id")
-data_df_100k = data_df.sample(n=100000, random_state=1)
+
+## ===========================================================
+# sampling data, each sample has have same number of spots, total 100k
+num_samples = data_df['sample_id'].nunique()
+base_rows = 100000 // num_samples  # 1063
+extra_rows = 100000 % num_samples   # 78
+
+# Get unique sample IDs and randomly select some for an extra row
+sample_ids = data_df['sample_id'].unique()
+extra_sample_ids = np.random.choice(sample_ids, extra_rows, replace=False)
+
+# Define a function to sample the required number of rows for each group
+def sample_group(group):
+    n_to_sample = base_rows + (1 if group.name in extra_sample_ids else 0)
+    return group.sample(n=n_to_sample, random_state=12)
+
+# Apply sampling by group
+data_df_100k = data_df.groupby('sample_id', group_keys=False).apply(sample_group)
+print(data_df_100k.shape)  # Should be (100000, ...)
+
+# data_df_100k = data_df.sample(n=100000, random_state=1)
 data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
 
 ## add sample_id to umap_embedding data
@@ -140,9 +164,14 @@ for file in files:
             continue
         new_name = subject_to_sample[subject_id] + ".csv"
         os.rename(project + "/coordinates/" + file, project + "/coordinates/" + new_name)
-  
 
-stop
+files = os.listdir(project + "/coordinates")
+for file in files:
+    if file.endswith(".csv"):
+        df = pd.read_csv(project + "/coordinates/" + file, index_col=0, header=0)
+        df.rename(index=barcode_to_sid, inplace=True)
+        df.to_csv(project + "/coordinates/" + file, index_label="cs_id")
+
 
 # %% ============================================================================
 # %%
@@ -151,10 +180,10 @@ print("Loading expression data...")
 expression_data = pd.read_csv(project + "/raw_normalized_expression_sparse.csv",index_col=None, header=0)
 ## rename "Cell" column use barcode_cid map
 print("Renaming....")
-expression_data["cs_id"] = expression_data["cs_id"].map(barcode_to_sid)
+expression_data["cs_id"] = expression_data["Spot"].map(barcode_to_sid)
 
 ## "Expression" column keep 4 digits after the decimal point
-expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 4))
+expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 2))
 
 ## save the new expression data
 expression_data.to_csv(project + "/normalized_expression_sparse.csv", index=False)

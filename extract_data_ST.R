@@ -22,6 +22,45 @@ umap_embeddings <- seurat_obj@reductions$umap@cell.embeddings
 write.csv(umap_embeddings, "ST/raw_umap_embeddings.csv", row.names = TRUE)
 
 
+library(Seurat)
+library(EBImage)
+images = seurat_obj@images
+all_names = names(images)
+
+## Create the directory
+dir.create("ST/images", showWarnings = FALSE)
+dir.create("ST/coordinates", showWarnings = FALSE)
+
+#Loop and extract the image data
+for (i in 1:length(all_names)) {
+    print(all_names[i])
+
+    image_name = all_names[i]
+    spatial_data = images[[image_name]]
+    image_array = spatial_data@image
+    coordinates = spatial_data@coordinates
+
+    # Extract the scale.factors from the Seurat object
+    scale_factors <- seurat_obj@images[["slice1"]]@scale.factors
+
+    # Remove the custom class attributes
+    scale_factors_plain <- unclass(scale_factors)
+
+    # Convert to JSON with pretty formatting
+    json_output <- toJSON(scale_factors_plain, pretty = TRUE, auto_unbox = TRUE)
+
+    # Convert to EBImage format
+    image_eb <- Image(image_array, colormode = "Color")
+
+    # Save as PNG (best for analysis)
+    writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".png"), type = "png")
+    writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".tiff"), type = "tiff")
+
+    write.csv(coordinates, paste0("ST/coordinates/raw_coordinates_", image_name, ".csv"), row.names = TRUE)
+}
+
+
+# ===================================================
 # Extract normalized counts (log-normalized values)
 print("Saving normalized data...")
 # raw_counts <- seurat_obj@assays$Spatial@counts
@@ -49,35 +88,3 @@ nonzero_data <- as.data.table(nonzero_data)
 
 # Save to CSV
 fwrite(nonzero_data, "ST/raw_normalized_expression_sparse.csv", row.names = FALSE)
-
-
-library(Seurat)
-library(EBImage)
-images = seurat_obj@images
-all_names = names(images)
-
-## Create the directory
-dir.create("ST/images", showWarnings = FALSE)
-dir.create("ST/coordinates", showWarnings = FALSE)
-
-#Loop and extract the image data
-for (i in 1:length(all_names)) {
-    print(all_names[i])
-
-    image_name = all_names[i]
-    spatial_data = images[[image_name]]
-    image_array = spatial_data@image
-    coordinates = spatial_data@coordinates
-
-    # Convert to EBImage format
-    image_eb <- Image(image_array, colormode = "Color")
-
-    # Save as PNG (best for analysis)
-    writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".png"), type = "png")
-    writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".tiff"), type = "tiff")
-
-    write.csv(coordinates, paste0("ST/coordinates/raw_coordinates_", image_name, ".csv"), row.names = TRUE)
-}
-
-
-

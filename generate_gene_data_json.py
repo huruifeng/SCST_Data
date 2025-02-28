@@ -17,8 +17,7 @@ all_genes = [gene_i.replace("/", "_") for gene_i in list(set(all_genes))]
 with open(project + "/gene_list.json", "w") as f:
     json.dump(sorted(all_genes), f)
 
-stop
-# %% =============================================
+#=====================================
 # Create directory for genes
 os.makedirs(project+ "/gene_jsons", exist_ok=True)
 
@@ -29,7 +28,7 @@ for gene, df in grouped_by_gene:
     try:
         i += 1
         print(i,gene)
-        gene_dict = dict(zip(df["Spot"], df["Expression"]))
+        gene_dict = dict(zip(df["cs_id"], df["Expression"]))
         
         safe_gene_name = gene.replace("/", "_")
 
