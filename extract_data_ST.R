@@ -41,13 +41,17 @@ for (i in 1:length(all_names)) {
     coordinates = spatial_data@coordinates
 
     # Extract the scale.factors from the Seurat object
-    scale_factors <- seurat_obj@images[["slice1"]]@scale.factors
+    scale_factors <- spatial_data@scale.factors
 
     # Remove the custom class attributes
     scale_factors_plain <- unclass(scale_factors)
+    scale_factors_plain$spot.radius = spatial_data@spot.radius
 
     # Convert to JSON with pretty formatting
     json_output <- toJSON(scale_factors_plain, pretty = TRUE, auto_unbox = TRUE)
+
+    # Save to a JSON file
+    write(json_output, paste0("ST/coordinates/raw_scalefactors_", image_name, ".json"))
 
     # Convert to EBImage format
     image_eb <- Image(image_array, colormode = "Color")

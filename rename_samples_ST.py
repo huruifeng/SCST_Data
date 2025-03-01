@@ -67,7 +67,7 @@ metadata["MajorCellTypes"] = metadata[["Astrocytes","Endothelial.Cells", "Fibrob
 metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(2)
 
 
-c_ls = ["sample_id","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
+c_ls = ["sample_id","nCount_Spatial","nFeature_Spatial","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
         "Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs","Pericytes.1","Pericytes.2","T.Cells","cell2loc_sum"]
 
 metadata_lite = metadata.loc[:,c_ls]
@@ -107,8 +107,15 @@ embeddings_data.to_csv(project + "/umap_embeddings.csv",index_label="cs_id")
 
 # sampling data
 data_df = pd.merge(embeddings_data, metadata_lite, left_index=True, right_index=True)
-data_df.to_csv(f'{project}umap_embeddings_with_meta.csv', index_label="cs_id")
+data_df.to_csv(f'{project}/umap_embeddings_with_meta.csv', index_label="cs_id")
 
+## save each column data into a separate json file
+os.makedirs(project+"/metas", exist_ok=True)
+for col in data_df.columns:
+    if col == "sample_id":
+        continue
+    with open(project + f"/metas/{col}.json", "w") as f:
+        json.dump(data_df[col].to_dict(), f, indent=2)
 
 ## ===========================================================
 # sampling data, each sample has have same number of spots, total 100k
@@ -135,6 +142,9 @@ data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label
 ## add sample_id to umap_embedding data
 embeddings_data["sample_id"] = embeddings_data.index.map(spot_to_sample)
 embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_label="cs_id")
+
+embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv", index_label="cs_id")
 
 ## rename imgage file name
 subject_to_sample = dict(zip(metadata["subject_id"].tolist(),metadata["sample_id"].tolist()))
@@ -164,7 +174,15 @@ for file in files:
             continue
         new_name = subject_to_sample[subject_id] + ".csv"
         os.rename(project + "/coordinates/" + file, project + "/coordinates/" + new_name)
+    if file.endswith(".json"):
+        subject_id = file[:-5].split("_")[-1]
+        if subject_id not in subject_to_sample:
+            print(subject_id)
+            continue
+        new_name = "scalefactors_"+subject_to_sample[subject_id] + ".json"
+        os.rename(project + "/coordinates/" + file, project + "/coordinates/" + new_name)
 
+# %% ============================================================================
 files = os.listdir(project + "/coordinates")
 for file in files:
     if file.endswith(".csv"):
@@ -172,7 +190,7 @@ for file in files:
         df.rename(index=barcode_to_sid, inplace=True)
         df.to_csv(project + "/coordinates/" + file, index_label="cs_id")
 
-
+stop
 # %% ============================================================================
 # %%
 print("Loading expression data...")
