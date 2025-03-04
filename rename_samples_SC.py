@@ -11,14 +11,14 @@ import numpy as np
 project = "SC"
 metadata = pd.read_csv( project + "/raw_metadata.csv", index_col=0, header=0)
 cell_ids = ["c_"+str(i) for i in range(1,metadata.shape[0]+1)]
-metadata["cell_id"] = cell_ids
+metadata["cs_id"] = cell_ids
 
-barcode_to_cid =  metadata["cell_id"].to_dict()
+barcode_to_cid =  metadata["cs_id"].to_dict()
 with open(project+"/barcode_to_cid.txt", "w") as f:
     json.dump(barcode_to_cid, f)
 
 metadata["barcode"] = metadata.index.tolist()
-metadata = metadata.set_index("cell_id")
+metadata = metadata.set_index("cs_id")
 
 # %%===============================
 ## change "sample_id" to "subject_id"
@@ -34,6 +34,10 @@ metadata.loc[(metadata["subject_id"] == "BN1076") & (metadata["batch"] == "batch
 
 
 metadata["sample_id"] = metadata["case"] + "_" + metadata["subject_id"] + "_MTG_snRNAseq_" +metadata["batch"] + "_" + metadata["replicate"]
+
+all_samples = metadata["sample_id"].unique().tolist()
+with open(project + "/sample_list.json", "w") as f:
+    json.dump(sorted(all_samples), f)
 
 ## save the new metadata
 metadata.to_csv(project + "/metadata.csv")
@@ -85,17 +89,21 @@ data_df.to_csv(f'{project}umap_embeddings_with_meta.csv', index_label="cs_id")
 
 ## save each column data into a separate json file
 os.makedirs(project+"/metas", exist_ok=True)
-for col in data_df.columns:
-    if col == "sample_id":
-        continue
-    with open(project + f"/metas/{col}.json", "w") as f:
-        json.dump(data_df[col].to_dict(), f, indent=2)
+data_df_by_sample = data_df.groupby("sample_id")
+for sample_id, df in data_df_by_sample:
+    os.makedirs(project+"/metas/"+sample_id, exist_ok=True)
+    for col in df.columns:
+        if col == "sample_id":
+            continue
+        with open(project + f"/metas/{sample_id}/{col}.json", "w") as f:
+            json.dump(df[col].to_dict(), f, indent=2)    
 
 ## ===========================================================
 # sampling data, each sample has have same number of spots, total 100k
+n_rows = 100000
 num_samples = data_df['sample_id'].nunique()
-base_rows = 100000 // num_samples  # 1063
-extra_rows = 100000 % num_samples   # 78
+base_rows = n_rows // num_samples 
+extra_rows = n_rows % num_samples
 
 # Get unique sample IDs and randomly select some for an extra row
 sample_ids = data_df['sample_id'].unique()
@@ -104,15 +112,37 @@ extra_sample_ids = np.random.choice(sample_ids, extra_rows, replace=False)
 # Define a function to sample the required number of rows for each group
 def sample_group(group):
     n_to_sample = base_rows + (1 if group.name in extra_sample_ids else 0)
+    if n_to_sample > group.shape[0]:
+        n_to_sample = group.shape[0]
     return group.sample(n=n_to_sample, random_state=12)
 
 # Apply sampling by group
 data_df_100k = data_df.groupby('sample_id', group_keys=False).apply(sample_group)
+n_x = n_rows - data_df_100k.shape[0]
+if n_x > 0:
+    data_df_rm_100k = data_df[~data_df.index.isin(data_df_100k.index)]
+    data_df_100k = pd.concat([data_df_100k, data_df_rm_100k.sample(n=n_x, random_state=12)])
 print(data_df_100k.shape)  # Should be (100000, ...)
 
 # data_df_100k = data_df.sample(n=100000, random_state=1)
 data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
 
+## for each sample, save each column data into a separate json file
+os.makedirs(project+"/metas_100k", exist_ok=True)
+meta_100k_by_sample = data_df_100k.groupby('sample_id')
+for sample_id, df in meta_100k_by_sample:
+    os.makedirs(project + f"/metas_100k/{sample_id}", exist_ok=True)
+    for col in df.columns:
+        if col == "sample_id":
+            continue
+        with open(project + f"/metas_100k/{sample_id}/{col}.json", "w") as f:
+            json.dump(df[col].to_dict(), f, indent=2)
+
+
+# ===========================================================
+# save the 100k data
+embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_100k.csv", index_label="cs_id")
 
 ## add sample_id to umap_embedding data
 embeddings_data["sample_id"] = embeddings_data.index.map(cell_to_sample)

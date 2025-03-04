@@ -52,6 +52,10 @@ metadata.loc[(metadata["subject_id"] == "BN1957"), "replicate"] = "rep2"
 metadata["batch"] = metadata["batch"].apply(lambda x: "batch"+str(x))
 metadata["sample_id"] = metadata["diagnosis"] + "_" + metadata["subject_id"] + "_MTG_VisiumST_" + metadata["batch"] + "_" + metadata["replicate"]
 
+all_samples = metadata["sample_id"].unique().tolist()
+with open(project + "/sample_list.json", "w") as f:
+    json.dump(sorted(all_samples), f)
+
 ## save the new metadata
 metadata.to_csv(project + "/metadata.csv")
 metadata.info()
@@ -111,17 +115,21 @@ data_df.to_csv(f'{project}/umap_embeddings_with_meta.csv', index_label="cs_id")
 
 ## save each column data into a separate json file
 os.makedirs(project+"/metas", exist_ok=True)
-for col in data_df.columns:
-    if col == "sample_id":
-        continue
-    with open(project + f"/metas/{col}.json", "w") as f:
-        json.dump(data_df[col].to_dict(), f, indent=2)
+data_df_by_sample = data_df.groupby('sample_id')
+for sample_id, df in data_df_by_sample:
+    os.makedirs(project + f"/metas/{sample_id}", exist_ok=True)
+    for col in df.columns:
+        if col == "sample_id":
+            continue
+        with open(project + f"/metas/{sample_id}/{col}.json", "w") as f:
+            json.dump(df[col].to_dict(), f, indent=2)
 
 ## ===========================================================
 # sampling data, each sample has have same number of spots, total 100k
+n_rows = 100000
 num_samples = data_df['sample_id'].nunique()
-base_rows = 100000 // num_samples  # 1063
-extra_rows = 100000 % num_samples   # 78
+base_rows = n_rows // num_samples  # 1063
+extra_rows = n_rows % num_samples   # 78
 
 # Get unique sample IDs and randomly select some for an extra row
 sample_ids = data_df['sample_id'].unique()
@@ -134,10 +142,31 @@ def sample_group(group):
 
 # Apply sampling by group
 data_df_100k = data_df.groupby('sample_id', group_keys=False).apply(sample_group)
+n_x = n_rows - data_df_100k.shape[0]
+if n_x > 0:
+    data_df_rm_100k = data_df[~data_df.index.isin(data_df_100k.index)]
+    data_df_100k = pd.concat([data_df_100k, data_df_rm_100k.sample(n=n_x, random_state=12)])
 print(data_df_100k.shape)  # Should be (100000, ...)
 
 # data_df_100k = data_df.sample(n=100000, random_state=1)
 data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
+
+## for each sample, save each column data into a separate json file
+os.makedirs(project+"/metas_100k", exist_ok=True)
+meta_100k_by_sample = data_df_100k.groupby('sample_id')
+for sample_id, df in meta_100k_by_sample:
+    os.makedirs(project + f"/metas_100k/{sample_id}", exist_ok=True)
+    for col in df.columns:
+        if col == "sample_id":
+            continue
+        with open(project + f"/metas_100k/{sample_id}/{col}.json", "w") as f:
+            json.dump(df[col].to_dict(), f, indent=2)
+
+
+
+embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_100k.csv", index_label="cs_id")
+
 
 ## add sample_id to umap_embedding data
 embeddings_data["sample_id"] = embeddings_data.index.map(spot_to_sample)
@@ -145,6 +174,7 @@ embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_la
 
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
 embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv", index_label="cs_id")
+
 
 ## rename imgage file name
 subject_to_sample = dict(zip(metadata["subject_id"].tolist(),metadata["sample_id"].tolist()))
@@ -164,6 +194,14 @@ for file in files:
             continue
         new_name = subject_to_sample[subject_id] + ".tiff"
         os.rename(project + "/images/" + file, project + "/images/" + new_name)
+    if file.endswith(".npy"):
+        subject_id = file[:-5].split("_")[-1]
+        if subject_id not in subject_to_sample:
+            print(subject_id)
+            continue
+        new_name = subject_to_sample[subject_id] + ".npy"
+        os.rename(project + "/images/" + file, project + "/images/" + new_name)
+
 
 files = os.listdir(project + "/coordinates")
 for file in files:

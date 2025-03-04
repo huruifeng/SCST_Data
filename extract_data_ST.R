@@ -1,5 +1,4 @@
 library(reticulate)
-use_condaenv("r4_env")  
 
 library(jsonlite)
 library(Matrix)
@@ -24,6 +23,7 @@ write.csv(umap_embeddings, "ST/raw_umap_embeddings.csv", row.names = TRUE)
 
 library(Seurat)
 library(EBImage)
+np <- import("numpy")
 images = seurat_obj@images
 all_names = names(images)
 
@@ -56,14 +56,20 @@ for (i in 1:length(all_names)) {
     # Convert to EBImage format
     image_eb <- Image(image_array, colormode = "Color")
 
+    # Convert to NumPy array and save
+    
+    np$save(paste0("ST/images/raw_array_", image_name, ".npy"), image_array)
+
     # Save as PNG (best for analysis)
     writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".png"), type = "png")
     writeImage(image_eb, paste0("ST/images/raw_image_", image_name, ".tiff"), type = "tiff")
 
+    # Save coordinates
+
     write.csv(coordinates, paste0("ST/coordinates/raw_coordinates_", image_name, ".csv"), row.names = TRUE)
 }
 
-
+exit(0)
 # ===================================================
 # Extract normalized counts (log-normalized values)
 print("Saving normalized data...")
