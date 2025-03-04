@@ -18,7 +18,7 @@ SpatialFeaturePlot(
   subset_obj,
   features = "nCount_Spatial",      # Replace with your target gene
   alpha = c(0.8, 1),          # Adjust transparency
-  pt.size.factor = 10,       # Adjust spot size
   image.alpha = 0.8,            # Image transparency
+  crop = F,                  # Crop the image
 ) + 
 theme(legend.position = "right")  # Customize legend

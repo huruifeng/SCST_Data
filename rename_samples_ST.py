@@ -71,11 +71,13 @@ metadata["MajorCellTypes"] = metadata[["Astrocytes","Endothelial.Cells", "Fibrob
 metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(2)
 
 
-c_ls = ["sample_id","nCount_Spatial","nFeature_Spatial","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
+meta_ls = ["sample_id","nCount_Spatial","nFeature_Spatial","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
         "Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs","Pericytes.1","Pericytes.2","T.Cells","cell2loc_sum"]
 
-metadata_lite = metadata.loc[:,c_ls]
+metadata_lite = metadata.loc[:,meta_ls]
 metadata_lite.to_csv(project + "/metadata_lite.csv",index_label="cs_id")
+with open(project + "/meta_list.json", "w") as f:
+    json.dump(meta_ls, f)
 
 # %% ============================================================================
 print("Converting data...")
@@ -163,7 +165,6 @@ for sample_id, df in meta_100k_by_sample:
             json.dump(df[col].to_dict(), f, indent=2)
 
 
-
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
 embeddings_data_100k.to_csv(f"{project}/umap_embeddings_100k.csv", index_label="cs_id")
 
@@ -228,7 +229,7 @@ for file in files:
         df.rename(index=barcode_to_sid, inplace=True)
         df.to_csv(project + "/coordinates/" + file, index_label="cs_id")
 
-stop
+
 # %% ============================================================================
 # %%
 print("Loading expression data...")
@@ -249,5 +250,5 @@ expression_data.to_csv(project + "/normalized_expression_sparse.csv", index=Fals
 expression_data["sample_id"] = expression_data["cs_id"].map(spot_to_sample)
 
 ## save expression data
-expression_data.to_csv(f"{project}/normalized_expression_sparse_with_sample.csv", index=False)
+expression_data.to_csv(f"{project}/normalized_expression_sparse_with_sample_id.csv", index=False)
 

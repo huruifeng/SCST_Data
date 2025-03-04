@@ -49,8 +49,11 @@ metadata.info()
 # "seurat_clusters","class","dblscore","MajorCellTypes",
 # "CellSubtypes","lbscore","mmse","updrs","sumlbd","ncxtlbd","plaqt","tanglt",
 # "Complex_Assignment","majormarker",barcode, subject_id, replicate ,sample_id
-metadata_lite = metadata.loc[:,["sample_id","case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes"]]
+meta_list = ["case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes"]
+metadata_lite = metadata.loc[:,["sample_id"] + meta_list]
 metadata_lite.to_csv(project + "/metadata_lite.csv")
+with open(project + "/meta_list.json", "w") as f:
+    json.dump(sorted(meta_list), f)
 
 # %% ============================================================================
 print("Converting data...")
@@ -151,7 +154,6 @@ embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_la
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
 embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv", index_label="cs_id")
 
-stop
 # %% ============================================================================
 # %%
 print("Loading expression data...")
@@ -162,7 +164,7 @@ print("Renaming....")
 expression_data["cs_id"] = expression_data["Cell"].map(barcode_to_cid)
 
 ## "Expression" column keep 4 digits after the decimal point
-expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 4))
+expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 2))
 
 ## save the new expression data
 expression_data.to_csv(project + "/normalized_expression_sparse.csv", index=False)
@@ -172,5 +174,5 @@ expression_data.to_csv(project + "/normalized_expression_sparse.csv", index=Fals
 expression_data["sample_id"] = expression_data["cs_id"].map(cell_to_sample)
 
 ## save expression data
-expression_data.to_csv(f"{project}/normalized_expression_sparse_with_sample.csv", index=False)
+expression_data.to_csv(f"{project}/normalized_expression_sparse_with_sample_id.csv", index=False)
 
