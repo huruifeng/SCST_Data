@@ -153,9 +153,12 @@ print(data_df_100k.shape)  # Should be (100000, ...)
 # data_df_100k = data_df.sample(n=100000, random_state=1)
 data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
 
+meta_100k = data_df_100k.loc[:,meta_ls]
+meta_100k.to_csv(f"{project}/metadata_lite_100k.csv",index_label="cs_id")
+
 ## for each sample, save each column data into a separate json file
 os.makedirs(project+"/metas_100k", exist_ok=True)
-meta_100k_by_sample = data_df_100k.groupby('sample_id')
+meta_100k_by_sample = meta_100k.groupby('sample_id')
 for sample_id, df in meta_100k_by_sample:
     os.makedirs(project + f"/metas_100k/{sample_id}", exist_ok=True)
     for col in df.columns:
@@ -229,7 +232,7 @@ for file in files:
         df.rename(index=barcode_to_sid, inplace=True)
         df.to_csv(project + "/coordinates/" + file, index_label="cs_id")
 
-
+stop
 # %% ============================================================================
 # %%
 print("Loading expression data...")

@@ -49,8 +49,8 @@ metadata.info()
 # "seurat_clusters","class","dblscore","MajorCellTypes",
 # "CellSubtypes","lbscore","mmse","updrs","sumlbd","ncxtlbd","plaqt","tanglt",
 # "Complex_Assignment","majormarker",barcode, subject_id, replicate ,sample_id
-meta_list = ["case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes"]
-metadata_lite = metadata.loc[:,["sample_id"] + meta_list]
+meta_list = ["sample_id","case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes"]
+metadata_lite = metadata.loc[:,meta_list]
 metadata_lite.to_csv(project + "/metadata_lite.csv")
 with open(project + "/meta_list.json", "w") as f:
     json.dump(sorted(meta_list), f)
@@ -130,9 +130,12 @@ print(data_df_100k.shape)  # Should be (100000, ...)
 # data_df_100k = data_df.sample(n=100000, random_state=1)
 data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
 
+meta_100k = data_df_100k.loc[:,meta_list]
+meta_100k.to_csv(f"{project}/metadata_lite_100k.csv",index_label="cs_id")
+
 ## for each sample, save each column data into a separate json file
 os.makedirs(project+"/metas_100k", exist_ok=True)
-meta_100k_by_sample = data_df_100k.groupby('sample_id')
+meta_100k_by_sample = meta_100k.groupby('sample_id')
 for sample_id, df in meta_100k_by_sample:
     os.makedirs(project + f"/metas_100k/{sample_id}", exist_ok=True)
     for col in df.columns:
@@ -154,6 +157,7 @@ embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_la
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
 embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv", index_label="cs_id")
 
+stop
 # %% ============================================================================
 # %%
 print("Loading expression data...")
