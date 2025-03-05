@@ -1,0 +1,51 @@
+Traceback (most recent call last):
+  File "/mnt/data/projects/donglab/ruifeng_2025/SCST_Data/rename_samples_SC.py", line 2, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+/mnt/data/projects/donglab/ruifeng_2025/SCST_Data/rename_samples_SC.py:123: DeprecationWarning: DataFrameGroupBy.apply operated on the grouping columns. This behavior is deprecated, and in a future version of pandas the grouping columns will be excluded from the operation. Either pass `include_groups=False` to exclude the groupings or explicitly select the grouping columns after groupby to silence this warning.
+  data_df_100k = data_df.groupby('sample_id', group_keys=False).apply(sample_group)
+<class 'pandas.core.frame.DataFrame'>
+Index: 551250 entries, c_1 to c_551250
+Data columns (total 32 columns):
+ #   Column              Non-Null Count   Dtype  
+---  ------              --------------   -----  
+ 0   orig.ident          551250 non-null  object 
+ 1   nCount_RNA          551250 non-null  int64  
+ 2   nFeature_RNA        551250 non-null  int64  
+ 3   case                551250 non-null  object 
+ 4   batch               551250 non-null  object 
+ 5   sex                 551250 non-null  object 
+ 6   RIN                 551250 non-null  float64
+ 7   PMI                 551250 non-null  float64
+ 8   age                 551250 non-null  int64  
+ 9   age_bracket         551250 non-null  object 
+ 10  PMI_bracket         551250 non-null  object 
+ 11  RIN_bracket         551250 non-null  object 
+ 12  percent.mt          551250 non-null  float64
+ 13  RNA_snn_res.1.5     551250 non-null  int64  
+ 14  seurat_clusters     551250 non-null  int64  
+ 15  class               551250 non-null  object 
+ 16  dblscore            551250 non-null  float64
+ 17  MajorCellTypes      551250 non-null  object 
+ 18  CellSubtypes        551250 non-null  object 
+ 19  lbscore             521708 non-null  float64
+ 20  mmse                457152 non-null  float64
+ 21  updrs               420219 non-null  float64
+ 22  sumlbd              524688 non-null  float64
+ 23  ncxtlbd             542413 non-null  float64
+ 24  plaqt               551250 non-null  float64
+ 25  tanglt              551250 non-null  float64
+ 26  Complex_Assignment  551250 non-null  object 
+ 27  majormarker         551250 non-null  object 
+ 28  barcode             551250 non-null  object 
+ 29  subject_id          551250 non-null  object 
+ 30  replicate           551250 non-null  object 
+ 31  sample_id           551250 non-null  object 
+dtypes: float64(11), int64(5), object(16)
+memory usage: 154.9+ MB
+Converting data...
+Loading embedding ....
+Renaming....
+(100000, 9)
+Loading expression data...
+Renaming....

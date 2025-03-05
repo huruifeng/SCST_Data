@@ -3,7 +3,7 @@ import json
 import os
 
 # %% =============================================
-project = "SC"
+project = "ST"
 # Load normalized expression data (sparse format)
 print("Reading data...")
 expression_data = pd.read_csv(project + "/normalized_expression_sparse_with_sample_id.csv",index_col=None, header=0)

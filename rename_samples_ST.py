@@ -238,6 +238,7 @@ expression_data = pd.read_csv(project + "/raw_normalized_expression_sparse.csv",
 ## rename "Cell" column use barcode_cid map
 print("Renaming....")
 expression_data["cs_id"] = expression_data["Spot"].map(barcode_to_sid)
+expression_data.drop("Spot", axis=1, inplace=True)
 
 ## "Expression" column keep 4 digits after the decimal point
 expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 2))

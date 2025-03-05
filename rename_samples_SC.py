@@ -88,7 +88,7 @@ embeddings_data.to_csv(project + "/umap_embeddings.csv",index_label="cs_id")
 
 # sampling data
 data_df = pd.merge(embeddings_data, metadata_lite, left_index=True, right_index=True)
-data_df.to_csv(f'{project}umap_embeddings_with_meta.csv', index_label="cs_id")
+data_df.to_csv(f'{project}/umap_embeddings_with_meta.csv', index_label="cs_id")
 
 ## save each column data into a separate json file
 os.makedirs(project+"/metas", exist_ok=True)
@@ -162,6 +162,7 @@ expression_data = pd.read_csv(project + "/raw_normalized_expression_sparse.csv",
 ## rename "Cell" column use barcode_cid map
 print("Renaming....")
 expression_data["cs_id"] = expression_data["Cell"].map(barcode_to_cid)
+expression_data.drop("Cell", axis=1, inplace=True)
 
 ## "Expression" column keep 4 digits after the decimal point
 expression_data["Expression"] = expression_data["Expression"].apply(lambda x: round(x, 2))
