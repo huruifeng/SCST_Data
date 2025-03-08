@@ -3,7 +3,7 @@ import json
 import os
 
 # %% =============================================
-project = "ST"
+project = "SC"
 # Load normalized expression data (sparse format)
 print("Reading data...")
 expression_data = pd.read_csv(project + "/normalized_expression_sparse_with_sample_id.csv",index_col=None, header=0)
@@ -34,11 +34,9 @@ for gene, df in grouped_by_gene:
 
         # Create JSON file
         file_name = f"{project}/gene_jsons/{safe_gene_name}.json"
-        if not os.path.exists(file_name):
-            with open(file_name, "w") as f:
-                json.dump(gene_dict, f, indent=4)
-        else:
-            print(f"File {file_name} already exists. Skipping...")
+        with open(file_name, "w") as f:
+            json.dump(gene_dict, f, indent=4)
+       
 
     except Exception as e:
         print(f"Error in processing {gene} !!! Check the error_gene.txt")
@@ -47,7 +45,7 @@ for gene, df in grouped_by_gene:
 
 ## calculate psuedo count of each gene in each sample
 print("Calculating pseudo count...")
-os.mkdir(project+"/gene_pseudobulk")
+os.mkdir(project+"/gene_pseudobulk",exist_ok=True)
 # Compute pseudo-bulk counts by summing expression values per (sample, gene)
 pseudo_bulk = expression_data.groupby(["sample_id", "Gene"])["Expression"].sum().reset_index()
 # Rename the expression value column
