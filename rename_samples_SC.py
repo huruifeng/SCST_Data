@@ -10,8 +10,20 @@ import numpy as np
 ## read metadata
 project = "SC"
 metadata = pd.read_csv( project + "/raw_metadata.csv", index_col=0, header=0)
-cell_ids = ["c_"+str(i) for i in range(1,metadata.shape[0]+1)]
+# cell_ids = ["c_"+str(i) for i in range(1,metadata.shape[0]+1)]
+# metadata["cs_id"] = cell_ids
+
+cell_ids = []
+subject_cell_n = {}
+for index, row in metadata.iterrows():
+    subject_id = row["sample_id"]
+    if subject_id not in subject_cell_n:
+        subject_cell_n[subject_id] = 0
+    subject_cell_n[subject_id] += 1
+    c_id = subject_id + "_c" + str(subject_cell_n[subject_id])
+    cell_ids.append(c_id)
 metadata["cs_id"] = cell_ids
+
 
 barcode_to_cid =  metadata["cs_id"].to_dict()
 with open(project+"/barcode_to_cid.txt", "w") as f:
@@ -49,11 +61,21 @@ metadata.info()
 # "seurat_clusters","class","dblscore","MajorCellTypes",
 # "CellSubtypes","lbscore","mmse","updrs","sumlbd","ncxtlbd","plaqt","tanglt",
 # "Complex_Assignment","majormarker",barcode, subject_id, replicate ,sample_id
-meta_list = ["sample_id","case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes"]
+meta_list = ["sample_id","case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes","mmse","updrs"]
 metadata_lite = metadata.loc[:,meta_list]
+metadata_lite["mmse"].fillna(0, inplace=True)
+metadata_lite["updrs"].fillna(0, inplace=True)
+
 metadata_lite.to_csv(project + "/metadata_lite.csv")
 with open(project + "/meta_list.json", "w") as f:
     json.dump(sorted(meta_list), f)
+
+
+sample_meta_list = ["sample_id","case","sex","age","mmse","updrs"]
+sample_meta = metadata_lite.loc[:,sample_meta_list]
+sample_meta = sample_meta.drop_duplicates()
+sample_meta = sample_meta.set_index("sample_id")
+sample_meta.to_csv(project + "/sample_metadata.csv")
 
 # %% ============================================================================
 print("Converting data...")
@@ -159,7 +181,6 @@ embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv"
 
 stop
 # %% ============================================================================
-# %%
 print("Loading expression data...")
 ## rename_expression_data
 expression_data = pd.read_csv(project + "/raw_normalized_expression_sparse.csv",index_col=None, header=0)

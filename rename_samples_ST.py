@@ -71,13 +71,22 @@ metadata["MajorCellTypes"] = metadata[["Astrocytes","Endothelial.Cells", "Fibrob
 metadata[metadata.select_dtypes(include=['float']).columns] = metadata.select_dtypes(include=['float']).round(2)
 
 
-meta_ls = ["sample_id","nCount_Spatial","nFeature_Spatial","sex", "diagnosis", "selected_spot","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5","MajorCellTypes",
+meta_ls = ["sample_id","nCount_Spatial","nFeature_Spatial","sex", "diagnosis", "last_mmse_test_score","motor_updrs_score","seurat_clusters","Spatial_snn_res.0.5","layer_label_v2","smoothed_label_s5",
         "Astrocytes","Endothelial.Cells", "Fibroblast.Like.Cells","Microglia","Oligodendrocytes","OPCs","Pericytes.1","Pericytes.2","T.Cells","cell2loc_sum"]
 
 metadata_lite = metadata.loc[:,meta_ls]
+metadata_lite["last_mmse_test_score"].fillna(0, inplace=True)
+metadata_lite["motor_updrs_score"].fillna(0, inplace=True)
+
 metadata_lite.to_csv(project + "/metadata_lite.csv",index_label="cs_id")
 with open(project + "/meta_list.json", "w") as f:
     json.dump(meta_ls, f)
+
+sample_meta_list = ["sample_id","diagnosis","sex","last_mmse_test_score","motor_updrs_score"]
+sample_meta = metadata_lite.loc[:,sample_meta_list]
+sample_meta = sample_meta.drop_duplicates()
+sample_meta = sample_meta.set_index("sample_id")
+sample_meta.to_csv(project + "/sample_metadata.csv")
 
 # %% ============================================================================
 print("Converting data...")
@@ -179,6 +188,8 @@ embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_la
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
 embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv", index_label="cs_id")
 
+
+stop
 
 ## rename imgage file name
 subject_to_sample = dict(zip(metadata["subject_id"].tolist(),metadata["sample_id"].tolist()))
