@@ -135,9 +135,10 @@ for sample_id, df in data_df_by_sample:
         with open(project + f"/metas/{sample_id}/{col}.json", "w") as f:
             json.dump(df[col].to_dict(), f, indent=2)
 
+# %%
 ## ===========================================================
 # sampling data, each sample has have same number of spots, total 100k
-n_rows = 100000
+n_rows = 50000
 num_samples = data_df['sample_id'].nunique()
 base_rows = n_rows // num_samples  # 1063
 extra_rows = n_rows % num_samples   # 78
@@ -160,37 +161,36 @@ if n_x > 0:
 print(data_df_100k.shape)  # Should be (100000, ...)
 
 # data_df_100k = data_df.sample(n=100000, random_state=1)
-data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_100k.csv', index_label="cs_id")
+data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_50k.csv', index_label="cs_id")
 
 meta_100k = data_df_100k.loc[:,meta_ls]
-meta_100k.to_csv(f"{project}/metadata_lite_100k.csv",index_label="cs_id")
+meta_100k.to_csv(f"{project}/metadata_lite_50k.csv",index_label="cs_id")
 
 ## for each sample, save each column data into a separate json file
-os.makedirs(project+"/metas_100k", exist_ok=True)
+os.makedirs(project+"/metas_50k", exist_ok=True)
 meta_100k_by_sample = meta_100k.groupby('sample_id')
 for sample_id, df in meta_100k_by_sample:
-    os.makedirs(project + f"/metas_100k/{sample_id}", exist_ok=True)
+    os.makedirs(project + f"/metas_50k/{sample_id}", exist_ok=True)
     for col in df.columns:
         if col == "sample_id":
             continue
-        with open(project + f"/metas_100k/{sample_id}/{col}.json", "w") as f:
+        with open(project + f"/metas_50k/{sample_id}/{col}.json", "w") as f:
             json.dump(df[col].to_dict(), f, indent=2)
 
-
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
-embeddings_data_100k.to_csv(f"{project}/umap_embeddings_100k.csv", index_label="cs_id")
-
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_50k.csv", index_label="cs_id")
 
 ## add sample_id to umap_embedding data
 embeddings_data["sample_id"] = embeddings_data.index.map(spot_to_sample)
 embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_label="cs_id")
 
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
-embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_100k.csv", index_label="cs_id")
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_50k.csv", index_label="cs_id")
 
 
 stop
 
+# %%
 ## rename imgage file name
 subject_to_sample = dict(zip(metadata["subject_id"].tolist(),metadata["sample_id"].tolist()))
 files = os.listdir(project + "/images")
