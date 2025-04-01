@@ -6,7 +6,7 @@ project <- "SC"
 genes <- c("RORB", "LAMP5")
 
 # Read UMAP embeddings
-umap_file <- file.path(project, "umap_embeddings_with_meta_50k.csv")
+umap_file <- file.path(project, "umap_embeddings_with_meta_30k.csv")
 data_df <- fread(umap_file)
 setnames(data_df, names(data_df)[1], "Cell")  # Set first column as 'Cell'
 
@@ -32,7 +32,7 @@ create_violin <- function(gene) {
     geom_violin(trim = FALSE, scale = "width") +
     # geom_boxplot(width=0.1) +
     # geom_jitter(width = 0.1, alpha = 0.5) +
-    labs(title = paste(gene, "Expression - 50k"), x = "Major Cell Types", y = "Expression Level") +
+    labs(title = paste(gene, "Expression - 30k"), x = "Major Cell Types", y = "Expression Level") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
@@ -51,16 +51,16 @@ for(gene in genes) {
 # Create scatter plots
 create_scatter_continuous <- function(feature) {
   ggplot(data_df, aes(x = UMAP_1, y = UMAP_2, color = .data[[feature]])) +
-    geom_point(size = 0.1) +
+    geom_point(size = 0.6) +
     scale_color_gradient(low = "gray", high = "red") +  # Color gradient from gray to red
-    labs(title = "50k", x = "UMAP_1", y = "UMAP_2") +
+    labs(title = "30k", x = "UMAP_1", y = "UMAP_2") +
     theme_minimal()
 }
 
 create_scatter<- function(feature) {
   ggplot(data_df, aes(x = UMAP_1, y = UMAP_2, color = .data[[feature]])) +
-    geom_point(size = 0.1) +
-    labs(title = "50k", x = "UMAP_1", y = "UMAP_1") +
+    geom_point(size = 0.6) +
+    labs(title = "30k", x = "UMAP_1", y = "UMAP_1") +
     theme_minimal()
 }
 
