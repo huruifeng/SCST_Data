@@ -1,0 +1,233 @@
+Formal class 'Seurat' [package "SeuratObject"] with 13 slots
+  ..@ assays      :List of 1
+  .. ..$ RNA:Formal class 'Assay' [package "SeuratObject"] with 8 slots
+  .. .. .. ..@ counts       :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
+  .. .. .. .. .. ..@ i       : int [1:1713394175] 10 47 90 138 159 186 196 203 207 208 ...
+  .. .. .. .. .. ..@ p       : int [1:551251] 0 2532 3770 4329 8923 11309 14780 20491 23403 23985 ...
+  .. .. .. .. .. ..@ Dim     : int [1:2] 35022 551250
+  .. .. .. .. .. ..@ Dimnames:List of 2
+  .. .. .. .. .. .. ..$ : chr [1:35022] "MIR1302-2HG" "OR4F5" "AL627309.1" "AL627309.3" ...
+  .. .. .. .. .. .. ..$ : chr [1:551250] "batch10_BN1827_AAACCCACATGCAGGA.1" "batch10_BN1827_AAACCCAGTCGTCAGC.1" "batch10_BN1827_AAACCCATCGCCATAA.1" "batch10_BN1827_AAACCCATCGGTGCAC.1" ...
+  .. .. .. .. .. ..@ x       : num [1:1713394175] 1 1 1 1 1 1 2 1 1 6 ...
+  .. .. .. .. .. ..@ factors : list()
+  .. .. .. ..@ data         :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
+  .. .. .. .. .. ..@ i       : int [1:1713394175] 10 47 90 138 159 186 196 203 207 208 ...
+  .. .. .. .. .. ..@ p       : int [1:551251] 0 2532 3770 4329 8923 11309 14780 20491 23403 23985 ...
+  .. .. .. .. .. ..@ Dim     : int [1:2] 35022 551250
+  .. .. .. .. .. ..@ Dimnames:List of 2
+  .. .. .. .. .. .. ..$ : chr [1:35022] "MIR1302-2HG" "OR4F5" "AL627309.1" "AL627309.3" ...
+  .. .. .. .. .. .. ..$ : chr [1:551250] "batch10_BN1827_AAACCCACATGCAGGA.1" "batch10_BN1827_AAACCCAGTCGTCAGC.1" "batch10_BN1827_AAACCCATCGCCATAA.1" "batch10_BN1827_AAACCCATCGGTGCAC.1" ...
+  .. .. .. .. .. ..@ x       : num [1:1713394175] 0.925 0.925 0.925 0.925 0.925 ...
+  .. .. .. .. .. ..@ factors : list()
+  .. .. .. ..@ scale.data   : num[0 , 0 ] 
+  .. .. .. ..@ assay.orig   : NULL
+  .. .. .. ..@ var.features : chr [1:1999] "NPY" "SST" "RELN" "HBB" ...
+  .. .. .. ..@ meta.features:'data.frame':	35022 obs. of  5 variables:
+  .. .. .. .. ..$ vst.mean                 : num [1:35022] 7.48e-05 1.43e-05 1.43e-02 1.08e-03 5.57e-05 ...
+  .. .. .. .. ..$ vst.variance             : num [1:35022] 7.48e-05 1.43e-05 1.49e-02 1.08e-03 5.57e-05 ...
+  .. .. .. .. ..$ vst.variance.expected    : num [1:35022] 7.67e-05 1.45e-05 1.71e-02 1.16e-03 5.70e-05 ...
+  .. .. .. .. ..$ vst.variance.standardized: num [1:35022] 0.975 0.986 0.872 0.931 0.977 ...
+  .. .. .. .. ..$ vst.variable             : logi [1:35022] FALSE FALSE FALSE FALSE FALSE FALSE ...
+  .. .. .. ..@ misc         : list()
+  .. .. .. ..@ key          : chr "rna_"
+  ..@ meta.data   :'data.frame':	551250 obs. of  29 variables:
+  .. ..$ orig.ident        : Factor w/ 31 levels "batch1","batch10",..: 2 2 2 2 2 2 2 2 2 2 ...
+  .. ..$ nCount_RNA        : num [1:551250] 6385 2057 825 16945 6678 ...
+  .. ..$ nFeature_RNA      : int [1:551250] 2532 1238 559 4594 2386 3471 5711 2912 582 3226 ...
+  .. ..$ sample_id         : chr [1:551250] "BN1827" "BN1827" "BN1827" "BN1827" ...
+  .. ..$ case              : chr [1:551250] "PD" "PD" "PD" "PD" ...
+  .. ..$ batch             : chr [1:551250] "batch10" "batch10" "batch10" "batch10" ...
+  .. ..$ sex               : chr [1:551250] "M" "M" "M" "M" ...
+  .. ..$ RIN               : num [1:551250] 8.2 8.2 8.2 8.2 8.2 8.2 8.2 8.2 8.2 8.2 ...
+  .. ..$ PMI               : num [1:551250] 4.2 4.2 4.2 4.2 4.2 4.2 4.2 4.2 4.2 4.2 ...
+  .. ..$ age               : int [1:551250] 89 89 89 89 89 89 89 89 89 89 ...
+  .. ..$ age_bracket       : chr [1:551250] "80-90" "80-90" "80-90" "80-90" ...
+  .. ..$ PMI_bracket       : Factor w/ 5 levels "(1,2]","(2,3]",..: 4 4 4 4 4 4 4 4 4 4 ...
+  .. ..$ RIN_bracket       : Factor w/ 4 levels "(6,7]","(7,8]",..: 3 3 3 3 3 3 3 3 3 3 ...
+  .. ..$ percent.mt        : num [1:551250] 2.82 2.65 4.07 4.76 3.76 ...
+  .. ..$ RNA_snn_res.1.5   : Factor w/ 102 levels "1","10","100",..: 15 17 12 48 81 40 48 37 48 11 ...
+  .. ..$ seurat_clusters   : Factor w/ 45 levels "1","2","3","4",..: 2 20 16 5 8 36 5 4 5 15 ...
+  .. ..$ class             : chr [1:551250] "singlet" "singlet" "singlet" "singlet" ...
+  .. ..$ dblscore          : chr [1:551250] "0.337272316217422" "0.059891726821661" "0.00234694546088576" "0.568710446357727" ...
+  .. ..$ MajorCellTypes    : chr [1:551250] "GLU_Neurons" "GABA_Neurons" "GABA_Neurons" "GLU_Neurons" ...
+  .. ..$ CellSubtypes      : chr [1:551250] "GLU_Neurons_1" "GABA_Neurons_6" "GABA_Neurons_3" "GLU_Neurons_4" ...
+  .. ..$ lbscore           : num [1:551250] 4 4 4 4 4 4 4 4 4 4 ...
+  .. ..$ mmse              : int [1:551250] 26 26 26 26 26 26 26 26 26 26 ...
+  .. ..$ updrs             : num [1:551250] 31 31 31 31 31 31 31 31 31 31 ...
+  .. ..$ sumlbd            : int [1:551250] 32 32 32 32 32 32 32 32 32 32 ...
+  .. ..$ ncxtlbd           : int [1:551250] 2 2 2 2 2 2 2 2 2 2 ...
+  .. ..$ plaqt             : num [1:551250] 4 4 4 4 4 4 4 4 4 4 ...
+  .. ..$ tanglt            : num [1:551250] 4.5 4.5 4.5 4.5 4.5 4.5 4.5 4.5 4.5 4.5 ...
+  .. ..$ Complex_Assignment: chr [1:551250] "LINC00507_FREM3_LINC01090" "PVALB_LGR5" "LAMP5_LCP2_(Rosehip)" "RORB_SEMA3E" ...
+  .. ..$ majormarker       : chr [1:551250] "LINC00507" "PVALB" "LAMP5" "RORB" ...
+  ..@ active.assay: chr "RNA"
+  ..@ active.ident: Factor w/ 72 levels "LINC00507_FREM3_LINC01090",..: 1 2 3 4 5 6 7 8 7 9 ...
+  .. ..- attr(*, "names")= chr [1:551250] "batch10_BN1827_AAACCCACATGCAGGA.1" "batch10_BN1827_AAACCCAGTCGTCAGC.1" "batch10_BN1827_AAACCCATCGCCATAA.1" "batch10_BN1827_AAACCCATCGGTGCAC.1" ...
+  ..@ graphs      : list()
+  ..@ neighbors   : list()
+  ..@ reductions  :List of 1
+  .. ..$ umap:Formal class 'DimReduc' [package "SeuratObject"] with 9 slots
+  .. .. .. ..@ cell.embeddings           : num [1:551250, 1:2] -3.67 6.53 11.42 2.04 -3.45 ...
+  .. .. .. .. ..- attr(*, "dimnames")=List of 2
+  .. .. .. .. .. ..$ : chr [1:551250] "batch10_BN1827_AAACCCACATGCAGGA.1" "batch10_BN1827_AAACCCAGTCGTCAGC.1" "batch10_BN1827_AAACCCATCGCCATAA.1" "batch10_BN1827_AAACCCATCGGTGCAC.1" ...
+  .. .. .. .. .. ..$ : chr [1:2] "UMAP_1" "UMAP_2"
+  .. .. .. ..@ feature.loadings          : num[0 , 0 ] 
+  .. .. .. ..@ feature.loadings.projected: num[0 , 0 ] 
+  .. .. .. ..@ assay.used                : chr "RNA"
+  .. .. .. ..@ global                    : logi TRUE
+  .. .. .. ..@ stdev                     : num(0) 
+  .. .. .. ..@ jackstraw                 :Formal class 'JackStrawData' [package "SeuratObject"] with 4 slots
+  .. .. .. .. .. ..@ empirical.p.values     : num[0 , 0 ] 
+  .. .. .. .. .. ..@ fake.reduction.scores  : num[0 , 0 ] 
+  .. .. .. .. .. ..@ empirical.p.values.full: num[0 , 0 ] 
+  .. .. .. .. .. ..@ overall.p.values       : num[0 , 0 ] 
+  .. .. .. ..@ misc                      : list()
+  .. .. .. ..@ key                       : chr "UMAP_"
+  ..@ images      : list()
+  ..@ project.name: chr "FullIntegration"
+  ..@ misc        : list()
+  ..@ version     :Classes 'package_version', 'numeric_version'  hidden list of 1
+  .. ..$ : int [1:3] 4 1 0
+  ..@ commands    :List of 8
+  .. ..$ NormalizeData.RNA             :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "NormalizeData.RNA"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-05 02:38:44"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr [1:2] "NormalizeData(SeuratObject, normalization.method = \"LogNormalize\", " "    scale.factor = 10000)"
+  .. .. .. ..@ params     :List of 5
+  .. .. .. .. ..$ assay               : chr "RNA"
+  .. .. .. .. ..$ normalization.method: chr "LogNormalize"
+  .. .. .. .. ..$ scale.factor        : num 10000
+  .. .. .. .. ..$ margin              : num 1
+  .. .. .. .. ..$ verbose             : logi TRUE
+  .. ..$ FindVariableFeatures.RNA      :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "FindVariableFeatures.RNA"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-05 02:49:16"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr [1:2] "FindVariableFeatures(SeuratObject, selection.method = \"vst\", " "    nfeatures = 2000)"
+  .. .. .. ..@ params     :List of 12
+  .. .. .. .. ..$ assay              : chr "RNA"
+  .. .. .. .. ..$ selection.method   : chr "vst"
+  .. .. .. .. ..$ loess.span         : num 0.3
+  .. .. .. .. ..$ clip.max           : chr "auto"
+  .. .. .. .. ..$ mean.function      :function (mat, display_progress)  
+  .. .. .. .. ..$ dispersion.function:function (mat, display_progress)  
+  .. .. .. .. ..$ num.bin            : num 20
+  .. .. .. .. ..$ binning.method     : chr "equal_width"
+  .. .. .. .. ..$ nfeatures          : num 2000
+  .. .. .. .. ..$ mean.cutoff        : num [1:2] 0.1 8
+  .. .. .. .. ..$ dispersion.cutoff  : num [1:2] 1 Inf
+  .. .. .. .. ..$ verbose            : logi TRUE
+  .. ..$ ScaleData.RNA                 :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "ScaleData.RNA"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-05 03:48:11"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr "ScaleData(SeuratObject, features = all.genes, verbose = FALSE)"
+  .. .. .. ..@ params     :List of 10
+  .. .. .. .. ..$ features          : chr [1:35035] "MIR1302-2HG" "OR4F5" "AL627309.1" "AL627309.3" ...
+  .. .. .. .. ..$ assay             : chr "RNA"
+  .. .. .. .. ..$ model.use         : chr "linear"
+  .. .. .. .. ..$ use.umi           : logi FALSE
+  .. .. .. .. ..$ do.scale          : logi TRUE
+  .. .. .. .. ..$ do.center         : logi TRUE
+  .. .. .. .. ..$ scale.max         : num 10
+  .. .. .. .. ..$ block.size        : num 1000
+  .. .. .. .. ..$ min.cells.to.block: num 3000
+  .. .. .. .. ..$ verbose           : logi FALSE
+  .. ..$ RunGLMPCA.RNA                 :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "RunGLMPCA.RNA"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-07 23:27:59"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr [1:2] "RunGLMPCA(SeuratObject, features = SeuratObject@assays$RNA@var.features, " "    L = 70)"
+  .. .. .. ..@ params     :List of 6
+  .. .. .. .. ..$ L             : num 70
+  .. .. .. .. ..$ assay         : chr "RNA"
+  .. .. .. .. ..$ features      : chr [1:2000] "NPY" "SST" "RELN" "HBB" ...
+  .. .. .. .. ..$ reduction.name: chr "glmpca"
+  .. .. .. .. ..$ reduction.key : chr "GLMPC_"
+  .. .. .. .. ..$ verbose       : logi TRUE
+  .. ..$ Seurat..ProjectDim.RNA.harmony:Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "Seurat::ProjectDim.RNA.harmony"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-08 01:29:29"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr [1:2] "Seurat::ProjectDim(object, reduction = reduction.save, overwrite = TRUE, " "    verbose = FALSE)"
+  .. .. .. ..@ params     :List of 7
+  .. .. .. .. ..$ reduction      : chr "harmony"
+  .. .. .. .. ..$ assay          : chr "RNA"
+  .. .. .. .. ..$ dims.print     : int [1:5] 1 2 3 4 5
+  .. .. .. .. ..$ nfeatures.print: num 20
+  .. .. .. .. ..$ overwrite      : logi TRUE
+  .. .. .. .. ..$ do.center      : logi FALSE
+  .. .. .. .. ..$ verbose        : logi FALSE
+  .. ..$ FindNeighbors.RNA.harmony     :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "FindNeighbors.RNA.harmony"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-14 11:23:29"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr "FindNeighbors(SeuratObject, reduction = \"harmony\", dims = 1:60)"
+  .. .. .. ..@ params     :List of 17
+  .. .. .. .. ..$ reduction      : chr "harmony"
+  .. .. .. .. ..$ dims           : int [1:60] 1 2 3 4 5 6 7 8 9 10 ...
+  .. .. .. .. ..$ assay          : chr "RNA"
+  .. .. .. .. ..$ k.param        : num 20
+  .. .. .. .. ..$ return.neighbor: logi FALSE
+  .. .. .. .. ..$ compute.SNN    : logi TRUE
+  .. .. .. .. ..$ prune.SNN      : num 0.0667
+  .. .. .. .. ..$ nn.method      : chr "annoy"
+  .. .. .. .. ..$ n.trees        : num 50
+  .. .. .. .. ..$ annoy.metric   : chr "euclidean"
+  .. .. .. .. ..$ nn.eps         : num 0
+  .. .. .. .. ..$ verbose        : logi TRUE
+  .. .. .. .. ..$ force.recalc   : logi FALSE
+  .. .. .. .. ..$ do.plot        : logi FALSE
+  .. .. .. .. ..$ graph.name     : chr [1:2] "RNA_nn" "RNA_snn"
+  .. .. .. .. ..$ l2.norm        : logi FALSE
+  .. .. .. .. ..$ cache.index    : logi FALSE
+  .. ..$ FindClusters                  :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "FindClusters"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-15 15:17:47"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr [1:2] "FindClusters(SeuratObject, resolution = 1.5, algorithm = 4, " "    method = \"igraph\")"
+  .. .. .. ..@ params     :List of 10
+  .. .. .. .. ..$ graph.name      : chr "RNA_snn"
+  .. .. .. .. ..$ modularity.fxn  : num 1
+  .. .. .. .. ..$ resolution      : num 1.5
+  .. .. .. .. ..$ method          : chr "igraph"
+  .. .. .. .. ..$ algorithm       : num 4
+  .. .. .. .. ..$ n.start         : num 10
+  .. .. .. .. ..$ n.iter          : num 10
+  .. .. .. .. ..$ random.seed     : num 0
+  .. .. .. .. ..$ group.singletons: logi TRUE
+  .. .. .. .. ..$ verbose         : logi TRUE
+  .. ..$ RunUMAP.RNA.harmony           :Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "RunUMAP.RNA.harmony"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2023-11-19 18:26:49"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr "RunUMAP(SeuratObject, reduction = \"harmony\", dims = 1:60)"
+  .. .. .. ..@ params     :List of 26
+  .. .. .. .. ..$ dims                : int [1:60] 1 2 3 4 5 6 7 8 9 10 ...
+  .. .. .. .. ..$ reduction           : chr "harmony"
+  .. .. .. .. ..$ assay               : chr "RNA"
+  .. .. .. .. ..$ slot                : chr "data"
+  .. .. .. .. ..$ umap.method         : chr "uwot"
+  .. .. .. .. ..$ return.model        : logi FALSE
+  .. .. .. .. ..$ n.neighbors         : int 30
+  .. .. .. .. ..$ n.components        : int 2
+  .. .. .. .. ..$ metric              : chr "cosine"
+  .. .. .. .. ..$ learning.rate       : num 1
+  .. .. .. .. ..$ min.dist            : num 0.3
+  .. .. .. .. ..$ spread              : num 1
+  .. .. .. .. ..$ set.op.mix.ratio    : num 1
+  .. .. .. .. ..$ local.connectivity  : int 1
+  .. .. .. .. ..$ repulsion.strength  : num 1
+  .. .. .. .. ..$ negative.sample.rate: int 5
+  .. .. .. .. ..$ uwot.sgd            : logi FALSE
+  .. .. .. .. ..$ seed.use            : int 42
+  .. .. .. .. ..$ angular.rp.forest   : logi FALSE
+  .. .. .. .. ..$ densmap             : logi FALSE
+  .. .. .. .. ..$ dens.lambda         : num 2
+  .. .. .. .. ..$ dens.frac           : num 0.3
+  .. .. .. .. ..$ dens.var.shift      : num 0.1
+  .. .. .. .. ..$ verbose             : logi TRUE
+  .. .. .. .. ..$ reduction.name      : chr "umap"
+  .. .. .. .. ..$ reduction.key       : chr "UMAP_"
+  ..@ tools       : list()

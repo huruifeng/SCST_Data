@@ -7,6 +7,7 @@ library(data.table)
 print("load RDS data...")
 ## Read the rds onject
 seurat_obj <- readRDS("data_Jie.rds") 
+capture.output(str(seurat_obj), file = "seurat_structure_Jie.txt")
 
 
 print("Save metadata...")
