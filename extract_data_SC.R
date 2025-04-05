@@ -4,7 +4,6 @@ library(data.table)
 library(Seurat)
 library(presto)
 
-stop
 
 print("load RDS data...")
 ## Read the rds onject
@@ -58,4 +57,4 @@ cell_type_markers <- FindAllMarkers(seurat_obj, group.by =  "MajorCellTypes")
 # Convert to data.table
 cell_type_markers_dt <- as.data.table(cell_type_markers)
 # Save to CSV
-fwrite(cell_type_markers_dt, "SC/cell_type_specific_markers.csv", row.names = FALSE)
+fwrite(cell_type_markers_dt, "SC/celltypes/celltype_FindAllMarkers.csv", row.names = FALSE)
