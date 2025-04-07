@@ -53,19 +53,24 @@ marker_genes_df = pd.DataFrame()
 for celltype in celltype_list:
     print("==========================")
     print("Processing cell type: ", celltype)
-    pct_detected[celltype] = {}
+    pct_detected[celltype] = []
     cells_in_celltype = metadata[metadata["MajorCellTypes"] == celltype]
     num_cells = len(cells_in_celltype)
-    pct_detected[celltype]["tatal_cells"] = num_cells
-
-    diagnosis_sex_grouped = cells_in_celltype.groupby(["case", "sex"])
-    for key, df in diagnosis_sex_grouped:
-        print("_".join(key))
-        key_str = "_".join(key) + "_cellcounts"
-        pct_detected[celltype][key_str] = len(df)
-        print(f"Number of cells in {key_str}: {len(df)}")
-
     
+
+    condations = metadata["case"].unique().tolist()
+    sex = metadata["sex"].unique().tolist()
+    for condation in condations:
+        for s in sex:
+            subgroup_counts = {}
+            print("Processing condation: ", condation, " and sex: ", s)
+            diagnosis_sex_group = cells_in_celltype[(cells_in_celltype["case"] == condation) & (cells_in_celltype["sex"] == s)]
+            n_cells = len(diagnosis_sex_group)
+            subgroup_counts["condation"] = condation
+            subgroup_counts["sex"] = s
+            subgroup_counts["cellcounts"] = n_cells
+            pct_detected[celltype].append(subgroup_counts)  # add the subgroup counts to the list
+            
     marker_genes = {}
     for gene in pool_genes:
         marker_genes[gene] = {}
@@ -92,18 +97,15 @@ for celltype in celltype_list:
         marker_genes[gene]["avg_expr"] = avg_expr
         marker_genes[gene]["is_marker"] = gene in marker_genes_dict[celltype]
         marker_genes[gene]["n_expr_cells"] = num_cells_with_gene_expr
-
-
-        for key, df in diagnosis_sex_grouped:
-            n_cells = len([cell for cell in gene_expr_in_cells if cell in df.index])
-            key_str = "n_expr_cells_" + "_".join(key)
-            marker_genes[gene][key_str] = n_cells
     
     marker_df = pd.DataFrame.from_dict(marker_genes, orient='index')
     marker_df["MajorCellTypes"] = celltype
+    marker_df["celltype_n_cells"] = num_cells
 
     marker_genes_df = pd.concat([marker_genes_df, marker_df], axis=0)
-    
+marker_genes_df["gene"] = marker_genes_df.index
+marker_genes_df = marker_genes_df.reset_index(drop=True)
+marker_genes_df = marker_genes_df[["gene", "MajorCellTypes", "celltype_n_cells"] + [col for col in marker_genes_df.columns if col not in ["gene", "MajorCellTypes", "celltype_n_cells"]]]  
 marker_genes_df.to_csv(project + "/celltypes/celltype_markergenes_cellcounts.csv", index=False)
 
 # Save the dictionary to a JSON file
@@ -111,12 +113,4 @@ with open(project + "/celltypes/celltype_cellcounts.json", "w") as f:
     json.dump(pct_detected, f, indent=4)    
 
 
-# %%
-
-for key, df in diagnosis_sex_grouped:
-    print("_".join(key),df)
-    # Do something with each group
-    # For example, you can calculate the mean of a specific column
-    # mean_value = df['your_column_name'].mean()
-    # print(f"Mean value for {name}: {mean_value}")
 # %%
