@@ -58,17 +58,17 @@ for celltype in celltype_list:
     num_cells = len(cells_in_celltype)
     
 
-    condations = metadata["case"].unique().tolist()
+    conditions = metadata["case"].unique().tolist()
     sex = metadata["sex"].unique().tolist()
-    for condation in condations:
+    for condition in conditions:
         for s in sex:
             subgroup_counts = {}
-            print("Processing condation: ", condation, " and sex: ", s)
-            diagnosis_sex_group = cells_in_celltype[(cells_in_celltype["case"] == condation) & (cells_in_celltype["sex"] == s)]
+            print("Processing condition: ", condition, " and sex: ", s)
+            diagnosis_sex_group = cells_in_celltype[(cells_in_celltype["case"] == condition) & (cells_in_celltype["sex"] == s)]
             n_cells = len(diagnosis_sex_group)
-            subgroup_counts["condation"] = condation
+            subgroup_counts["condition"] = condition
             subgroup_counts["sex"] = s
-            subgroup_counts["cellcounts"] = n_cells
+            subgroup_counts["count"] = n_cells
             pct_detected[celltype].append(subgroup_counts)  # add the subgroup counts to the list
             
     marker_genes = {}
@@ -113,4 +113,3 @@ with open(project + "/celltypes/celltype_cellcounts.json", "w") as f:
     json.dump(pct_detected, f, indent=4)    
 
 
-# %%
