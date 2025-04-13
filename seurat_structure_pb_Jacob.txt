@@ -1,0 +1,71 @@
+Formal class 'Seurat' [package "SeuratObject"] with 13 slots
+  ..@ assays      :List of 1
+  .. ..$ RNA:Formal class 'Assay5' [package "SeuratObject"] with 8 slots
+  .. .. .. ..@ layers    :List of 3
+  .. .. .. .. ..$ counts    :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
+  .. .. .. .. .. .. ..@ i       : int [1:14842450] 5 10 11 12 13 15 16 18 19 20 ...
+  .. .. .. .. .. .. ..@ p       : int [1:932] 0 20723 32176 36007 58316 85718 102415 121161 140026 153986 ...
+  .. .. .. .. .. .. ..@ Dim     : int [1:2] 35022 931
+  .. .. .. .. .. .. ..@ Dimnames:List of 2
+  .. .. .. .. .. .. .. ..$ : NULL
+  .. .. .. .. .. .. .. ..$ : NULL
+  .. .. .. .. .. .. ..@ x       : num [1:14842450] 9 62 1 15 2 6 2 2 20 36 ...
+  .. .. .. .. .. .. ..@ factors : list()
+  .. .. .. .. ..$ data      : num [1:35022, 1:931] 0 0 0 0 0 ...
+  .. .. .. .. ..$ scale.data: num [1:35022, 1:931] -0.0952 -0.0438 -0.3124 -0.1969 -0.0564 ...
+  .. .. .. ..@ cells     :Formal class 'LogMap' [package "SeuratObject"] with 1 slot
+  .. .. .. .. .. ..@ .Data: logi [1:931, 1:3] TRUE TRUE TRUE TRUE TRUE TRUE ...
+  .. .. .. .. .. .. ..- attr(*, "dimnames")=List of 2
+  .. .. .. .. .. .. .. ..$ : chr [1:931] "BN0009_Astrocytes_PD" "BN0009_Endothelial-Cells_PD" "BN0009_Fibroblast-Like-Cells_PD" "BN0009_GABA-Neurons_PD" ...
+  .. .. .. .. .. .. .. ..$ : chr [1:3] "counts" "data" "scale.data"
+  .. .. .. .. .. ..$ dim     : int [1:2] 931 3
+  .. .. .. .. .. ..$ dimnames:List of 2
+  .. .. .. .. .. .. ..$ : chr [1:931] "BN0009_Astrocytes_PD" "BN0009_Endothelial-Cells_PD" "BN0009_Fibroblast-Like-Cells_PD" "BN0009_GABA-Neurons_PD" ...
+  .. .. .. .. .. .. ..$ : chr [1:3] "counts" "data" "scale.data"
+  .. .. .. ..@ features  :Formal class 'LogMap' [package "SeuratObject"] with 1 slot
+  .. .. .. .. .. ..@ .Data: logi [1:35022, 1:3] TRUE TRUE TRUE TRUE TRUE TRUE ...
+  .. .. .. .. .. .. ..- attr(*, "dimnames")=List of 2
+  .. .. .. .. .. .. .. ..$ : chr [1:35022] "MIR1302-2HG" "OR4F5" "AL627309.1" "AL627309.3" ...
+  .. .. .. .. .. .. .. ..$ : chr [1:3] "counts" "data" "scale.data"
+  .. .. .. .. .. ..$ dim     : int [1:2] 35022 3
+  .. .. .. .. .. ..$ dimnames:List of 2
+  .. .. .. .. .. .. ..$ : chr [1:35022] "MIR1302-2HG" "OR4F5" "AL627309.1" "AL627309.3" ...
+  .. .. .. .. .. .. ..$ : chr [1:3] "counts" "data" "scale.data"
+  .. .. .. ..@ default   : int 1
+  .. .. .. ..@ assay.orig: chr(0) 
+  .. .. .. ..@ meta.data :'data.frame':	35022 obs. of  0 variables
+  .. .. .. ..@ misc      : Named list()
+  .. .. .. ..@ key       : chr "rna_"
+  ..@ meta.data   :'data.frame':	931 obs. of  4 variables:
+  .. ..$ orig.ident    : chr [1:931] "BN0009_Astrocytes_PD" "BN0009_Endothelial-Cells_PD" "BN0009_Fibroblast-Like-Cells_PD" "BN0009_GABA-Neurons_PD" ...
+  .. ..$ sample_id     : chr [1:931] "BN0009" "BN0009" "BN0009" "BN0009" ...
+  .. ..$ MajorCellTypes: chr [1:931] "Astrocytes" "Endothelial-Cells" "Fibroblast-Like-Cells" "GABA-Neurons" ...
+  .. ..$ case          : chr [1:931] "PD" "PD" "PD" "PD" ...
+  ..@ active.assay: chr "RNA"
+  ..@ active.ident: Factor w/ 931 levels "BN0009_Astrocytes_PD",..: 1 2 3 4 5 6 7 8 9 10 ...
+  .. ..- attr(*, "names")= chr [1:931] "BN0009_Astrocytes_PD" "BN0009_Endothelial-Cells_PD" "BN0009_Fibroblast-Like-Cells_PD" "BN0009_GABA-Neurons_PD" ...
+  ..@ graphs      : list()
+  ..@ neighbors   : list()
+  ..@ reductions  : list()
+  ..@ images      : list()
+  ..@ project.name: chr "Aggregate"
+  ..@ misc        : list()
+  ..@ version     :Classes 'package_version', 'numeric_version'  hidden list of 1
+  .. ..$ : int [1:3] 5 0 2
+  ..@ commands    :List of 1
+  .. ..$ ScaleData.RNA:Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
+  .. .. .. ..@ name       : chr "ScaleData.RNA"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2025-04-12 21:28:15"
+  .. .. .. ..@ assay.used : chr "RNA"
+  .. .. .. ..@ call.string: chr "ScaleData(object = toRet, verbose = verbose)"
+  .. .. .. ..@ params     :List of 9
+  .. .. .. .. ..$ assay             : chr "RNA"
+  .. .. .. .. ..$ model.use         : chr "linear"
+  .. .. .. .. ..$ use.umi           : logi FALSE
+  .. .. .. .. ..$ do.scale          : logi TRUE
+  .. .. .. .. ..$ do.center         : logi TRUE
+  .. .. .. .. ..$ scale.max         : num 10
+  .. .. .. .. ..$ block.size        : num 1000
+  .. .. .. .. ..$ min.cells.to.block: num 3000
+  .. .. .. .. ..$ verbose           : logi TRUE
+  ..@ tools       : list()

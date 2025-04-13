@@ -68,6 +68,8 @@ print("Calculating differential expression...")
 cell_types <- unique(seurat_obj$MajorCellTypes)
 # Initialize an empty list to store results
 de_results_list <- list()
+de_results_topN_list <- list()
+
 # Loop through each cell type
 for (cell_type in cell_types) {
 	# Print the current cell type # nolint: whitespace_linter, indentation_linter.
@@ -84,38 +86,74 @@ for (cell_type in cell_types) {
 		for (i in 1:ncol(combinations)) {
 			ident.1 <- combinations[1, i]
 			ident.2 <- combinations[2, i]
-			de_results <- FindMarkers(subset_obj, ident.1 = ident.1, ident.2 = ident.2, group.by = "case", test.use = "DESeq2")
+			de_results <- FindMarkers(subset_obj, ident.1 = ident.1, ident.2 = ident.2, group.by = "case")
+			## add a column for the gene names
+			de_results$gene <- rownames(de_results)
+			
+			## filter out genes with padj > 0.05
+			# de_results <- de_results[de_results$p_val_adj < 0.05, ]
+			
+			## get top 10 upregulated DE genes and downregulated, base on logFC
+			de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+		
 			# Store the results in the list
-			de_results_list[[paste(cell_type, ident.1, ident.2, sep = "_")]] <- de_results
+			de_results_list[[paste(cell_type, paste(ident.1, ident.2, sep = "vs"), sep = ".")]] <- de_results
+			de_results_topN_list[[paste(cell_type, paste(ident.1, ident.2, sep = "vs"), sep = ".")]] <- de_results_topN
 		}
 	} else {
-		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = "case", test.use = "DESeq2")
-		de_results_list[[paste(cell_type, condition_ls[1], condition_ls[2], sep = "_")]] <- de_results
+		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = "case")
+		## add a column for the gene names
+		de_results$gene <- rownames(de_results)
+
+		## filter out genes with padj > 0.05
+		# de_results <- de_results[de_results$p_val_adj < 0.05, ]
+		
+		## get top 10 upregulated DE genes and downregulated, base on logFC
+		de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+		
+		de_results_list[[paste(cell_type, paste(ident.1, ident.2, sep = "vs"), sep = ".")]] <- de_results
+		de_results_topN_list[[paste(cell_type, paste(ident.1, ident.2, sep = "vs"), sep = ".")]] <- de_results_topN
+
 	}
 }
 # Convert the list to a data.table
-de_results_dt <- rbindlist(de_results_list, idcol = "CellType")
+de_results_dt <- rbindlist(de_results_list, idcol = "CellType_DE")
+de_results_topN_dt <- rbindlist(de_results_topN_list, idcol = "CellType_DE")
 # Save to CSV
 fwrite(de_results_dt, "SC/celltypes/celltype_DEGs.csv", row.names = FALSE)
+fwrite(de_results_topN_dt, "SC/celltypes/celltype_DEGs_top10.csv", row.names = FALSE)
 
 
 ## ============================================================
 # pseudo-bulk DE analysis in each cell type
 print("Calculating pseudo-bulk analysis...")
 # Create a new Seurat object for pseudo-bulk analysis
-pb_obj <- AggregateExpression(ifnb, assays = "RNA", return.seurat = T, group.by = c("sample_id", "case", "MajorCellTypes"))
-tail(Cells(pseudo_ifnb))
+pb_obj <- AggregateExpression(seurat_obj, assays = "RNA", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
+tail(Cells(pb_obj))
+capture.output(str(pb_obj), file = "seurat_structure_pb_Jacob.txt")
+## replace "-" wuth "_" in MajorCellTypes
+pb_obj$MajorCellTypes <- gsub("-", "_", pb_obj$MajorCellTypes)
+
+metadata = pb_obj@meta.data
+write.csv(metadata, "raw_metadata_PB.csv", row.names = TRUE)
 
 # Define the cell types
-cell_types <- unique(seurat_obj$MajorCellTypes)
+cell_types <- unique(pb_obj$MajorCellTypes)
 # Initialize an empty list to store results
 pseudo_bulk_list <- list()
+pseudo_bulk_topN_list <- list()
 # Loop through each cell type
 for (cell_type in cell_types) {
 	# Print the current cell type # nolint: whitespace_linter, indentation_linter.
 	print(paste("Processing cell type:", cell_type))
 	# Subset the Seurat object to the current cell type # nolint
-	subset_obj <- subset(pb_obj, idents = cell_type)
+	subset_obj <- subset(pb_obj, subset = MajorCellTypes == cell_type)
+
+	# subset_obj$celltype.case <- paste(subset_obj$MajorCellTypes, subset_obj$case, sep = "_")
+	# Idents(subset_obj) <- "celltype.case"
+	# mono.de <- FindMarkers(subset_obj, ident.1 = "GLU_Neurons_PD", ident.2 = "GLU_Neurons_HC", verbose = FALSE)
+	# fwrite(mono.de, "GLU_Neurons_PD.HC_pseudobulk_DEGs.csv", row.names = FALSE)
+
 	# Calculate differential expression between conditions
 	# Here, we assume that the conditions are stored in the "Condition" metadata column 
 	# You may need to adjust this based on your actual metadata structure
@@ -126,16 +164,49 @@ for (cell_type in cell_types) {
 		for (i in 1:ncol(combinations)) {
 			ident.1 <- combinations[1, i]
 			ident.2 <- combinations[2, i]
-			de_results <- FindMarkers(subset_obj, ident.1 = ident.1, ident.2 = ident.2, group.by = "case", test.use = "DESeq2")
+			de_results <- FindMarkers(subset_obj, ident.1 = ident.1, ident.2 = ident.2, group.by = "case", use.method = "DEseq2")
+			## add a column for the gene names
+			de_results$gene <- rownames(de_results)
+			
+			## filter out genes with padj > 0.05
+			# de_results <- de_results[de_results$p_val_adj < 0.1, ]
+
+			## get top 10 upregulated DE genes and downregulated, base on logFC
+			de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+			
 			# Store the results in the list
-			pseudo_bulk_list[[paste(cell_type, ident.1, ident.2, sep = "_")]] <- de_results
+			pseudo_bulk_list[[paste(cell_type, paste(ident.1, ident.2, sep = "vs"), sep = ".")]] <- de_results
+			pseudo_bulk_topN_list[[paste(cell_type, paste(ident.1, ident.2, sep = "vs"), sep = ".")]] <- de_results_topN
 		}
 	} else {
-		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = "case", test.use = "DESeq2")
-		pseudo_bulk_list[[paste(cell_type, condition_ls[1], condition_ls[2], sep = "_")]] <- de_results
+		de_results <- FindMarkers(subset_obj, ident.1 = condition_ls[1], ident.2 = condition_ls[2], group.by = "case",use.method = "DEseq2")
+		## add a column for the gene names
+		de_results$gene <- rownames(de_results)
+		
+		## filter out genes with padj > 0.05
+		# de_results <- de_results[de_results$p_val_adj < 0.05, ]
+		
+		## get top 10 upregulated DE genes and downregulated, base on logFC
+		de_results_topN <- rbind(de_results[order(de_results$avg_log2FC, decreasing = TRUE), ][1:10, ],de_results[order(de_results$avg_log2FC, decreasing = FALSE), ][1:10, ])
+		
+		# Store the results in the list
+		pseudo_bulk_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results
+		pseudo_bulk_topN_list[[paste(cell_type, paste(condition_ls[1], condition_ls[2], sep = "vs"), sep = ".")]] <- de_results_topN
 	}
 }
 # Convert the list to a data.table
-pseudo_bulk_dt <- rbindlist(pseudo_bulk_list, idcol = "CellType")
+pseudo_bulk_dt <- rbindlist(pseudo_bulk_list, idcol = "CellType_DE")
+pseudo_bulk_topN_dt <- rbindlist(pseudo_bulk_topN_list, idcol = "CellType_DE")
 # Save to CSV
 fwrite(pseudo_bulk_dt, "SC/celltypes/celltype_pseudobulk_DEGs.csv", row.names = FALSE)
+fwrite(pseudo_bulk_topN_dt, "SC/celltypes/celltype_pseudobulk_DEGs_top10.csv", row.names = FALSE)
+
+
+# GLU_Neurons.PD.HC,0,2.28155130213196,0.347,0.128,0,AP001977.1
+# GLU_Neurons.PD.HC,0,1.09698217771197,0.346,0.199,0,SNX31
+# GLU_Neurons.PD.HC,0,3.11789946773066,0.236,0.1,0,AC105402.3
+subset_obj <- subset(seurat_obj, subset = MajorCellTypes == "GLU_Neurons")
+VlnPlot(subset_obj, features = c("AP001977.1", "SNX31", "AC105402.3"), idents = c("PD", "HC"), group.by = "case") 
+
+pb_subset_obj <- subset(pb_obj, subset = MajorCellTypes == "GLU_Neurons")
+VlnPlot(pb_subset_obj, features = c("AP001977.1", "SNX31", "AC105402.3"), idents = c("PD", "HC"), group.by = "case") 
