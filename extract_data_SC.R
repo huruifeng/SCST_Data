@@ -128,14 +128,24 @@ fwrite(de_results_topN_dt, "SC/celltypes/celltype_DEGs_top10.csv", row.names = F
 # pseudo-bulk DE analysis in each cell type
 print("Calculating pseudo-bulk analysis...")
 # Create a new Seurat object for pseudo-bulk analysis
-pb_obj <- AggregateExpression(seurat_obj, assays = "RNA", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
+pb_obj <- PseudobulkExpression(seurat_obj, assays = "RNA", method= "aggregate", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
 tail(Cells(pb_obj))
 capture.output(str(pb_obj), file = "seurat_structure_pb_Jacob.txt")
 ## replace "-" wuth "_" in MajorCellTypes
 pb_obj$MajorCellTypes <- gsub("-", "_", pb_obj$MajorCellTypes)
+pb_obj$orig.ident <- gsub("-", "_", pb_obj$orig.ident)
 
 metadata = pb_obj@meta.data
-write.csv(metadata, "raw_metadata_PB.csv", row.names = TRUE)
+## rename sample_id to sampleId
+colnames(metadata)[colnames(metadata) == "sample_id"] <- "sampleId"
+colnames(metadata)[colnames(metadata) == "case"] <- "condition"
+
+write.csv(metadata, "SC/celltypes/metadata_sample_celltype_condition.csv", row.names = FALSE)
+
+expr_matrix <- GetAssayData(pb_obj, assay = "RNA", slot = "data")
+colnames(expr_matrix) <- gsub("-", "_", colnames(expr_matrix))
+write.csv(expr_matrix, "SC/celltypes/pb_expr_matrix.csv", row.names = TRUE)
+
 
 # Define the cell types
 cell_types <- unique(pb_obj$MajorCellTypes)
@@ -200,6 +210,16 @@ pseudo_bulk_topN_dt <- rbindlist(pseudo_bulk_topN_list, idcol = "CellType_DE")
 # Save to CSV
 fwrite(pseudo_bulk_dt, "SC/celltypes/celltype_pseudobulk_DEGs.csv", row.names = FALSE)
 fwrite(pseudo_bulk_topN_dt, "SC/celltypes/celltype_pseudobulk_DEGs_top10.csv", row.names = FALSE)
+
+pooled_topN_DEGs = pseudo_bulk_topN_dt$gene
+## remove duplicates
+pooled_topN_DEGs <- unique(pooled_topN_DEGs)
+## subset expr_matrix to only include pooled_topN_DEGs
+expr_matrix_pooled_topN_DGEs <- expr_matrix[pooled_topN_DEGs, ]
+## save the pooled_topN_DEGs expression matrix
+write.csv(expr_matrix_pooled_topN_DGEs, "SC/celltypes/pb_expr_matrix_topN_DEGs.csv", row.names = TRUE)
+
+
 
 
 # GLU_Neurons.PD.HC,0,2.28155130213196,0.347,0.128,0,AP001977.1

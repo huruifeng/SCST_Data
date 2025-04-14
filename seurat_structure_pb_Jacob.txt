@@ -9,10 +9,10 @@ Formal class 'Seurat' [package "SeuratObject"] with 13 slots
   .. .. .. .. .. .. ..@ Dimnames:List of 2
   .. .. .. .. .. .. .. ..$ : NULL
   .. .. .. .. .. .. .. ..$ : NULL
-  .. .. .. .. .. .. ..@ x       : num [1:14842450] 9 62 1 15 2 6 2 2 20 36 ...
+  .. .. .. .. .. .. ..@ x       : num [1:14842450] 24.42 91.16 1.26 23.21 2.61 ...
   .. .. .. .. .. .. ..@ factors : list()
   .. .. .. .. ..$ data      : num [1:35022, 1:931] 0 0 0 0 0 ...
-  .. .. .. .. ..$ scale.data: num [1:35022, 1:931] -0.0952 -0.0438 -0.3124 -0.1969 -0.0564 ...
+  .. .. .. .. ..$ scale.data: num [1:35022, 1:931] -0.0904 -0.0413 -0.3391 -0.2135 -0.0519 ...
   .. .. .. ..@ cells     :Formal class 'LogMap' [package "SeuratObject"] with 1 slot
   .. .. .. .. .. ..@ .Data: logi [1:931, 1:3] TRUE TRUE TRUE TRUE TRUE TRUE ...
   .. .. .. .. .. .. ..- attr(*, "dimnames")=List of 2
@@ -55,7 +55,7 @@ Formal class 'Seurat' [package "SeuratObject"] with 13 slots
   ..@ commands    :List of 1
   .. ..$ ScaleData.RNA:Formal class 'SeuratCommand' [package "SeuratObject"] with 5 slots
   .. .. .. ..@ name       : chr "ScaleData.RNA"
-  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2025-04-12 21:28:15"
+  .. .. .. ..@ time.stamp : POSIXct[1:1], format: "2025-04-13 20:05:09"
   .. .. .. ..@ assay.used : chr "RNA"
   .. .. .. ..@ call.string: chr "ScaleData(object = toRet, verbose = verbose)"
   .. .. .. ..@ params     :List of 9
