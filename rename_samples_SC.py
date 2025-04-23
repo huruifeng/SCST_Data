@@ -61,7 +61,7 @@ metadata.info()
 # "seurat_clusters","class","dblscore","MajorCellTypes",
 # "CellSubtypes","lbscore","mmse","updrs","sumlbd","ncxtlbd","plaqt","tanglt",
 # "Complex_Assignment","majormarker",barcode, subject_id, replicate ,sample_id
-meta_list = ["sample_id","case","sex","age","seurat_clusters","MajorCellTypes","CellSubtypes","mmse","updrs"]
+meta_list = ["sample_id","case","sex","age","seurat_clusters","Complex_Assignment","MajorCellTypes","CellSubtypes","mmse","updrs",]
 metadata_lite = metadata.loc[:,meta_list]
 metadata_lite["mmse"].fillna(0, inplace=True)
 metadata_lite["updrs"].fillna(0, inplace=True)
@@ -125,60 +125,83 @@ for sample_id, df in data_df_by_sample:
 
 # %%
 ## ===========================================================
-# sampling data, each sample has have same number of spots, total 100k
-n_rows = 20000
-num_samples = data_df['sample_id'].nunique()
-base_rows = n_rows // num_samples 
-extra_rows = n_rows % num_samples
+# sampling data, based on the MajorCellTypes proportion in the original data, total 100k
+n_rows = 50000
 
-# Get unique sample IDs and randomly select some for an extra row
-sample_ids = data_df['sample_id'].unique()
-extra_sample_ids = np.random.choice(sample_ids, extra_rows, replace=False)
+## calcalate the ratio of each MajorCellTypes
+major_cell_types_ratio = data_df["MajorCellTypes"].value_counts(normalize=True)
+major_cell_types_ratio = major_cell_types_ratio.sort_index()
+major_cell_types_ratio = major_cell_types_ratio.to_dict()
+print("MajorCellTypes ratio: ", major_cell_types_ratio)
+## calculate the number of samples for each MajorCellTypes
+major_cell_types_n = {}
+for major_cell_type, ratio in major_cell_types_ratio.items():
+    major_cell_types_n[major_cell_type] = int(ratio * n_rows)
+print("MajorCellTypes number: ", major_cell_types_n)
+## sample the data
+data_df_100k = pd.DataFrame()
+for major_cell_type, n in major_cell_types_n.items():
+    ## sample the data
+    df = data_df[data_df["MajorCellTypes"] == major_cell_type]
+    if df.shape[0] > n:
+        df = df.sample(n=n, random_state=12)
+    else:
+        print(f"Warning: {major_cell_type} has only {df.shape[0]} samples, using all of them.")
+    data_df_100k = pd.concat([data_df_100k, df])
+print("Sampled data shape: ", data_df_100k.shape)
 
-# Define a function to sample the required number of rows for each group
-def sample_group(group):
-    n_to_sample = base_rows + (1 if group.name in extra_sample_ids else 0)
-    if n_to_sample > group.shape[0]:
-        n_to_sample = group.shape[0]
-    return group.sample(n=n_to_sample, random_state=12)
+# num_samples = data_df['sample_id'].nunique()
+# base_rows = n_rows // num_samples 
+# extra_rows = n_rows % num_samples
 
-# Apply sampling by group
-data_df_100k = data_df.groupby('sample_id', group_keys=False).apply(sample_group)
-n_x = n_rows - data_df_100k.shape[0]
-if n_x > 0:
-    data_df_rm_100k = data_df[~data_df.index.isin(data_df_100k.index)]
-    data_df_100k = pd.concat([data_df_100k, data_df_rm_100k.sample(n=n_x, random_state=12)])
-print(data_df_100k.shape)  # Should be (100000, ...)
+# # Get unique sample IDs and randomly select some for an extra row
+# sample_ids = data_df['sample_id'].unique()
+# extra_sample_ids = np.random.choice(sample_ids, extra_rows, replace=False)
+
+# # Define a function to sample the required number of rows for each group
+# def sample_group(group):
+#     n_to_sample = base_rows + (1 if group.name in extra_sample_ids else 0)
+#     if n_to_sample > group.shape[0]:
+#         n_to_sample = group.shape[0]
+#     return group.sample(n=n_to_sample, random_state=12)
+
+# # Apply sampling by group
+# data_df_100k = data_df.groupby('sample_id', group_keys=False).apply(sample_group)
+# n_x = n_rows - data_df_100k.shape[0]
+# if n_x > 0:
+#     data_df_rm_100k = data_df[~data_df.index.isin(data_df_100k.index)]
+#     data_df_100k = pd.concat([data_df_100k, data_df_rm_100k.sample(n=n_x, random_state=12)])
+# print(data_df_100k.shape)  # Should be (100000, ...)
 
 # data_df_100k = data_df.sample(n=100000, random_state=1)
-data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_20k.csv', index_label="cs_id")
+data_df_100k.to_csv(f'{project}/umap_embeddings_with_meta_50k.csv', index_label="cs_id")
 
 meta_100k = data_df_100k.loc[:,meta_list]
-meta_100k.to_csv(f"{project}/metadata_lite_20k.csv",index_label="cs_id")
+meta_100k.to_csv(f"{project}/metadata_lite_50k.csv",index_label="cs_id")
 
 ## for each sample, save each column data into a separate json file
-os.makedirs(project+"/metas_20k", exist_ok=True)
+os.makedirs(project+"/metas_50k", exist_ok=True)
 meta_100k_by_sample = meta_100k.groupby('sample_id')
 for sample_id, df in meta_100k_by_sample:
-    os.makedirs(project + f"/metas_20k/{sample_id}", exist_ok=True)
+    os.makedirs(project + f"/metas_50k/{sample_id}", exist_ok=True)
     for col in df.columns:
         if col == "sample_id":
             continue
-        with open(project + f"/metas_20k/{sample_id}/{col}.json", "w") as f:
+        with open(project + f"/metas_50k/{sample_id}/{col}.json", "w") as f:
             json.dump(df[col].to_dict(), f, indent=2)
 
 
 # ===========================================================
 # save the 100k data
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
-embeddings_data_100k.to_csv(f"{project}/umap_embeddings_20k.csv", index_label="cs_id")
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_50k.csv", index_label="cs_id")
 
 ## add sample_id to umap_embedding data
 embeddings_data["sample_id"] = embeddings_data.index.map(cell_to_sample)
 embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_label="cs_id")
 
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
-embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_20k.csv", index_label="cs_id")
+embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_50k.csv", index_label="cs_id")
 
 stop
 # %% ============================================================================

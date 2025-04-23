@@ -128,7 +128,8 @@ fwrite(de_results_topN_dt, "SC/celltypes/celltype_DEGs_top10.csv", row.names = F
 # pseudo-bulk DE analysis in each cell type
 print("Calculating pseudo-bulk analysis...")
 # Create a new Seurat object for pseudo-bulk analysis
-pb_obj <- PseudobulkExpression(seurat_obj, assays = "RNA", method= "aggregate", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
+# pb_obj <- AggregateExpression(seurat_obj, assays = "RNA", slot = "counts", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
+pb_obj <- PseudobulkExpression(seurat_obj,assays = "RNA", layer = "counts", method= "aggregate", return.seurat = T, group.by = c("sample_id", "MajorCellTypes", "case"))
 tail(Cells(pb_obj))
 capture.output(str(pb_obj), file = "seurat_structure_pb_Jacob.txt")
 ## replace "-" wuth "_" in MajorCellTypes
@@ -143,6 +144,7 @@ colnames(metadata)[colnames(metadata) == "case"] <- "condition"
 write.csv(metadata, "SC/celltypes/metadata_sample_celltype_condition.csv", row.names = FALSE)
 
 expr_matrix <- GetAssayData(pb_obj, assay = "RNA", slot = "data")
+# colnames(expr_matrix) <- gsub("_", ".", colnames(expr_matrix))
 colnames(expr_matrix) <- gsub("-", "_", colnames(expr_matrix))
 write.csv(expr_matrix, "SC/celltypes/pb_expr_matrix.csv", row.names = TRUE)
 
