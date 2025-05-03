@@ -53,6 +53,7 @@ pseudo_bulk.rename(columns={"Expression": "pseudobulk_expr"}, inplace=True)
 
 # Save each gene's data to a separate JSON file
 for gene, df_gene in pseudo_bulk.groupby("Gene"):
+    print(gene)
     gene_dict = df_gene.set_index("sample_id")["pseudobulk_expr"].to_dict()
     safe_gene_name = gene.replace("/", "_")
     with open(f"{project}/gene_pseudobulk/{safe_gene_name}.json", "w") as f:

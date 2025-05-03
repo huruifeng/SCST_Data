@@ -97,8 +97,8 @@ with open(f"{project}/sample_to_cell.json", "w") as f:
 print("Loading embedding ....")
 embeddings_data = pd.read_csv(project + "/raw_umap_embeddings.csv",index_col=0, header=0)
 
-embeddings_data["UMAP_1"] = embeddings_data["UMAP_1"].apply(lambda x: round(x, 2))
-embeddings_data["UMAP_2"] = embeddings_data["UMAP_2"].apply(lambda x: round(x, 2))
+embeddings_data["UMAP_1"] = embeddings_data["UMAP_1"].round(2)
+embeddings_data["UMAP_2"] = embeddings_data["UMAP_2"].round(2)
 
 ## reset index use barcode_cid map
 # Reset index and rename using the mapping

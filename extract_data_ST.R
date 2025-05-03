@@ -4,11 +4,46 @@ library(jsonlite)
 library(Matrix)
 library(data.table)
 
+library(Seurat)
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+
 print("load RDS data...")
 ## Read the rds onject
 seurat_obj <- readRDS("data_Jie.rds") 
 capture.output(str(seurat_obj), file = "seurat_structure_Jie.txt")
 
+# Make sure 'condition' is in your metadata — adjust the column name as needed!
+df <- seurat_obj@meta.data %>%
+  select(sample = sample_name, condition=diagnosis, nFeature_Spatial)
+# Order sample factor so that samples within the same condition are grouped together
+sample_order <- df %>%
+  distinct(sample, condition) %>%
+  arrange(condition, sample) %>%
+  pull(sample)
+
+df$sample <- factor(df$sample, levels = sample_order)
+
+# Define a colorful palette for conditions
+num_conditions <- length(unique(df$condition))
+palette_colors <- brewer.pal(min(num_conditions, 8), "Set2")
+
+# Create the plot
+p <- ggplot(df, aes(x = sample, y = nFeature_Spatial, fill = condition)) +
+  geom_boxplot(outlier.shape = NA) +
+  scale_fill_manual(values = palette_colors) +
+  theme_minimal() +
+  labs(title = "Feature Counts per Sample (Grouped by Condition)",
+       x = "Sample",
+       y = "Number of Features (Genes Detected)",
+       fill = "Condition") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Save to PDF
+pdf("feature_counts_grouped_by_condition.pdf", width = 16, height = 6)
+print(p)
+dev.off()
 
 print("Save metadata...")
 # Save to CSV with index as the first column
