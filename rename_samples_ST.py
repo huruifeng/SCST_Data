@@ -187,7 +187,6 @@ embeddings_data.to_csv(f"{project}/umap_embeddings_with_sample_id.csv", index_la
 embeddings_data_100k = embeddings_data.loc[data_df_100k.index]
 embeddings_data_100k.to_csv(f"{project}/umap_embeddings_with_sample_id_50k.csv", index_label="cs_id")
 
-
 stop
 
 # %%
